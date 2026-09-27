@@ -446,14 +446,12 @@
       "openedAt": "2026-09-21T18:13:14.187Z",
       "dryState": "dry",
       "location": {
-        "kind": "ams",
-        "printer": "maker-bee",
-        "slot": 1
+        "kind": "storage"
       },
       "id": "174c1584-d03a-40f2-b5be-35a84e0735b8",
       "addedAt": "2026-09-21T18:13:14.187Z"
     }
   ],
   "emptySpools": 5,
-  "updatedAt": "2026-09-26T14:01:23.181Z"
+  "updatedAt": "2026-09-27T11:48:38.746Z"
 }
