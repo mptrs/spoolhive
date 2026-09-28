@@ -32,7 +32,8 @@
         "kind": "storage"
       },
       "id": "c556936a-4b74-4673-8391-b3e16872c318",
-      "addedAt": "2026-09-28T21:29:44.011Z"
+      "addedAt": "2026-09-28T21:29:44.011Z",
+      "notes": "Transpa"
     },
     {
       "brand": "Prusa",
@@ -733,5 +734,5 @@
     }
   ],
   "emptySpools": 4,
-  "updatedAt": "2026-09-28T21:29:44.013Z"
+  "updatedAt": "2026-09-28T21:29:55.961Z"
 }
