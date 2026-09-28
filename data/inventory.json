@@ -35,7 +35,8 @@
         "slot": 2
       },
       "id": "f8ed0b79-9a76-4f5e-85b3-067d64c2a251",
-      "addedAt": "2026-09-28T21:35:25.784Z"
+      "addedAt": "2026-09-28T21:35:25.784Z",
+      "notes": "Transparent "
     },
     {
       "brand": "Elegoo",
@@ -839,5 +840,5 @@
     }
   ],
   "emptySpools": 4,
-  "updatedAt": "2026-09-28T21:35:25.785Z"
+  "updatedAt": "2026-09-28T21:35:31.516Z"
 }
