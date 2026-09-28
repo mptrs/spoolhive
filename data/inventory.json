@@ -18,6 +18,24 @@
   ],
   "spools": [
     {
+      "brand": "Prusa",
+      "material": "PLA Basic",
+      "colorName": "Galaxy Black",
+      "hex": "#000000",
+      "form": "spool",
+      "mounted": false,
+      "netWeightG": 1000,
+      "remainingPct": 60,
+      "sealed": false,
+      "openedAt": "2026-09-28T21:26:11.962Z",
+      "dryState": "dry",
+      "location": {
+        "kind": "storage"
+      },
+      "id": "417c0b72-da1e-4b80-babf-08d0f8251378",
+      "addedAt": "2026-09-28T21:26:11.969Z"
+    },
+    {
       "brand": "Bambu Lab",
       "material": "PLA Basic",
       "colorName": "Mistletoe Green",
@@ -698,5 +716,5 @@
     }
   ],
   "emptySpools": 4,
-  "updatedAt": "2026-09-28T21:24:21.828Z"
+  "updatedAt": "2026-09-28T21:26:11.971Z"
 }
