@@ -18,6 +18,23 @@
   ],
   "spools": [
     {
+      "brand": "Elegoo",
+      "material": "Rapid PETG",
+      "colorName": "White",
+      "hex": "#FFFFFF",
+      "form": "spool",
+      "mounted": false,
+      "netWeightG": 1000,
+      "remainingPct": 100,
+      "sealed": true,
+      "dryState": "dry",
+      "location": {
+        "kind": "storage"
+      },
+      "id": "c556936a-4b74-4673-8391-b3e16872c318",
+      "addedAt": "2026-09-28T21:29:44.011Z"
+    },
+    {
       "brand": "Prusa",
       "material": "PLA Basic",
       "colorName": "Galaxy Black",
@@ -716,5 +733,5 @@
     }
   ],
   "emptySpools": 4,
-  "updatedAt": "2026-09-28T21:26:11.971Z"
+  "updatedAt": "2026-09-28T21:29:44.013Z"
 }
