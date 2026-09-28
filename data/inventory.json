@@ -19,6 +19,24 @@
   "spools": [
     {
       "brand": "Bambu Lab",
+      "material": "PETG Basic",
+      "colorName": "Black",
+      "hex": "#000000",
+      "form": "refill",
+      "mounted": true,
+      "netWeightG": 1000,
+      "remainingPct": 70,
+      "sealed": false,
+      "openedAt": "2026-09-28T21:13:01.340Z",
+      "dryState": "dry",
+      "location": {
+        "kind": "storage"
+      },
+      "id": "12673233-1043-42de-8fd9-81586839cace",
+      "addedAt": "2026-09-28T21:13:01.341Z"
+    },
+    {
+      "brand": "Bambu Lab",
       "material": "PLA Matte",
       "colorName": "Dark Green",
       "hex": "#68724D",
@@ -472,6 +490,6 @@
       "addedAt": "2026-09-21T18:13:14.187Z"
     }
   ],
-  "emptySpools": 5,
-  "updatedAt": "2026-09-28T21:12:26.485Z"
+  "emptySpools": 4,
+  "updatedAt": "2026-09-28T21:13:01.342Z"
 }
