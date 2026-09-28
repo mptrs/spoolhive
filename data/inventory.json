@@ -18,6 +18,23 @@
   ],
   "spools": [
     {
+      "brand": "Elegoo",
+      "material": "PETG Translucent",
+      "colorName": "Amber",
+      "hex": "#B16D3A",
+      "form": "spool",
+      "mounted": false,
+      "netWeightG": 1000,
+      "remainingPct": 100,
+      "sealed": true,
+      "dryState": "dry",
+      "location": {
+        "kind": "storage"
+      },
+      "id": "ee5bf4ef-97c5-4006-9348-bc153a284657",
+      "addedAt": "2026-09-28T21:33:10.126Z"
+    },
+    {
       "brand": "Bambu Lab",
       "material": "PETG Basic",
       "colorName": "Black",
@@ -802,5 +819,5 @@
     }
   ],
   "emptySpools": 4,
-  "updatedAt": "2026-09-28T21:32:50.560Z"
+  "updatedAt": "2026-09-28T21:33:10.127Z"
 }
