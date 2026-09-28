@@ -20,6 +20,23 @@
     {
       "brand": "Bambu Lab",
       "material": "PETG Basic",
+      "colorName": "Black",
+      "hex": "#000000",
+      "form": "refill",
+      "mounted": false,
+      "netWeightG": 1000,
+      "remainingPct": 100,
+      "sealed": true,
+      "dryState": "dry",
+      "location": {
+        "kind": "storage"
+      },
+      "id": "30278c5c-5a4e-4d27-af69-d8d3eec84765",
+      "addedAt": "2026-09-28T21:32:08.416Z"
+    },
+    {
+      "brand": "Bambu Lab",
+      "material": "PETG Basic",
       "colorName": "Pine Green",
       "hex": "#034638",
       "form": "spool",
@@ -751,5 +768,5 @@
     }
   ],
   "emptySpools": 4,
-  "updatedAt": "2026-09-28T21:31:42.045Z"
+  "updatedAt": "2026-09-28T21:32:08.417Z"
 }
