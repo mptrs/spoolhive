@@ -18,6 +18,23 @@
   ],
   "spools": [
     {
+      "brand": "Bambu Lab",
+      "material": "PETG Basic",
+      "colorName": "Pine Green",
+      "hex": "#034638",
+      "form": "spool",
+      "mounted": false,
+      "netWeightG": 1000,
+      "remainingPct": 100,
+      "sealed": true,
+      "dryState": "dry",
+      "location": {
+        "kind": "storage"
+      },
+      "id": "ebf8ade7-7c48-4d20-a904-0c461587d603",
+      "addedAt": "2026-09-28T21:31:42.044Z"
+    },
+    {
       "brand": "Elegoo",
       "material": "Rapid PETG",
       "colorName": "White",
@@ -734,5 +751,5 @@
     }
   ],
   "emptySpools": 4,
-  "updatedAt": "2026-09-28T21:29:57.561Z"
+  "updatedAt": "2026-09-28T21:31:42.045Z"
 }
