@@ -19,6 +19,23 @@
   "spools": [
     {
       "brand": "Bambu Lab",
+      "material": "PLA Matte",
+      "colorName": "Terracotta",
+      "hex": "#B15533",
+      "form": "refill",
+      "mounted": false,
+      "netWeightG": 1000,
+      "remainingPct": 100,
+      "sealed": true,
+      "dryState": "dry",
+      "location": {
+        "kind": "storage"
+      },
+      "id": "5368d55e-b31c-41f6-97ba-96f001f78d92",
+      "addedAt": "2026-09-28T21:23:11.478Z"
+    },
+    {
+      "brand": "Bambu Lab",
       "material": "PLA Basic",
       "colorName": "Jade White",
       "hex": "#FFFFFF",
@@ -664,5 +681,5 @@
     }
   ],
   "emptySpools": 4,
-  "updatedAt": "2026-09-28T21:22:50.418Z"
+  "updatedAt": "2026-09-28T21:23:11.479Z"
 }
