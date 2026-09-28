@@ -19,6 +19,23 @@
   "spools": [
     {
       "brand": "Bambu Lab",
+      "material": "PLA Matte",
+      "colorName": "Terracotta",
+      "hex": "#B15533",
+      "form": "refill",
+      "mounted": false,
+      "netWeightG": 1000,
+      "remainingPct": 100,
+      "sealed": true,
+      "dryState": "dry",
+      "location": {
+        "kind": "storage"
+      },
+      "id": "662c2ab2-c574-45ec-ac87-c2d4af035e6e",
+      "addedAt": "2026-09-28T21:18:55.416Z"
+    },
+    {
+      "brand": "Bambu Lab",
       "material": "PLA Basic",
       "colorName": "Mistletoe Green",
       "hex": "#3F8E43",
@@ -577,5 +594,5 @@
     }
   ],
   "emptySpools": 4,
-  "updatedAt": "2026-09-28T21:18:14.350Z"
+  "updatedAt": "2026-09-28T21:18:55.416Z"
 }
