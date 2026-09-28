@@ -73,8 +73,8 @@
       "material": "TPU-95A",
       "colorName": "HF Black",
       "hex": "#101820",
-      "form": "refill",
-      "mounted": true,
+      "form": "spool",
+      "mounted": false,
       "netWeightG": 1000,
       "remainingPct": 90,
       "sealed": false,
@@ -697,6 +697,6 @@
       "addedAt": "2026-09-21T18:13:14.187Z"
     }
   ],
-  "emptySpools": 3,
-  "updatedAt": "2026-09-28T21:24:07.987Z"
+  "emptySpools": 4,
+  "updatedAt": "2026-09-28T21:24:21.828Z"
 }
