@@ -19,6 +19,24 @@
   "spools": [
     {
       "brand": "Bambu Lab",
+      "material": "TPU-95A",
+      "colorName": "HF Black",
+      "hex": "#101820",
+      "form": "refill",
+      "mounted": true,
+      "netWeightG": 1000,
+      "remainingPct": 90,
+      "sealed": false,
+      "openedAt": "2026-09-28T21:22:15.539Z",
+      "dryState": "dry",
+      "location": {
+        "kind": "storage"
+      },
+      "id": "51258c8d-174f-4b50-9db6-b3201eda3311",
+      "addedAt": "2026-09-28T21:22:15.540Z"
+    },
+    {
+      "brand": "Bambu Lab",
       "material": "PLA Matte",
       "colorName": "Terracotta",
       "hex": "#B15533",
@@ -628,6 +646,6 @@
       "addedAt": "2026-09-21T18:13:14.187Z"
     }
   ],
-  "emptySpools": 4,
-  "updatedAt": "2026-09-28T21:20:12.683Z"
+  "emptySpools": 3,
+  "updatedAt": "2026-09-28T21:22:15.541Z"
 }
