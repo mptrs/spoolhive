@@ -2,7 +2,7 @@ import type { JSX } from 'preact';
 import { useApp } from '../lib/store';
 import { back, href } from '../lib/router';
 import { locationText, needsSpool, totalSlots, type Location, type Spool } from '../lib/types';
-import { Bar, Icon, Note, Swatch, pctColor } from '../components/ui';
+import { Bar, BackButton, Icon, Note, Swatch, pctColor } from '../components/ui';
 import { setLocation } from '../lib/actions';
 
 export function LoadSlot({ printerId, slot }: { printerId: string; slot: number }): JSX.Element {
@@ -45,9 +45,7 @@ export function LoadSlot({ printerId, slot }: { printerId: string; slot: number 
   return (
     <div class="screen">
       <header class="topbar">
-        <a class="iconbtn" href={href('/')} aria-label="Back to printers">
-          <Icon name="chevronLeft" />
-        </a>
+        <BackButton to="/" label="Back to printers" />
         <div class="grow">
           <div class="topbar__title">Load {printer.amsUnits > 0 ? `A${slot}` : printer.name}</div>
           <div class="muted">{where}</div>

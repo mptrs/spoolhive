@@ -19,11 +19,13 @@ import { dirname, join } from 'node:path';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const RAW = join(root, 'data', 'catalog-raw.json');
 const OUT = join(root, 'src', 'catalog.generated.json');
+const EXTRA = join(root, 'data', 'catalog-extra.json');
 
 // The manufacturer always wins; community data fills what they do not publish.
 // A swatch image the sampler was unsure about sits last: it is a real reading,
 // but a listed pair of colours beats an averaged one.
 const PRIORITY = {
+  manual: 9,
   'bambu-official': 5,
   'elegoo.com': 5,
   spoolmandb: 3,
@@ -307,9 +309,57 @@ if (process.argv.includes('--refresh')) {
   await writeFile(RAW, `${JSON.stringify(input, null, 1)}\n`);
 }
 
+/**
+ * The app only tracks PLA, PETG, TPU and ASA, so the catalogue is cut down to those.
+ * This runs after normalise(), on the final range names.
+ */
+const KEEP = /^(Rapid )?(PLA|PETG|TPU|ASA)\b|^Tough PLA$/i;
+const DROP = /CF|GF|HF|Support|Aero|emoji|72D|85A|90A/i;
+
+// Ranges that are the same product under two names: fold the second into the first.
+const FOLD = {
+  Elegoo: { 'Rapid TPU 95A': 'TPU', 'TPU 95A': 'TPU' },
+  'Bambu Lab': { 'TPU-95A': 'TPU' },
+};
+// Elegoo's plain "PLA" is the same colour set as PLA+, and its emoji edition a
+// subset of it; keeping them would list every colour two or three times.
+const REDUNDANT_RANGES = { Elegoo: ['PLA'] };
+
+// Duplicate spellings and stragglers, found by reading the catalogue.
+const RENAME = { 'Bambu Lab|JadeWhite': 'Jade White' };
+const REMOVE = new Set([
+  'Bambu Lab|PLA Basic|White Jade', // filamentcolors' reading of Jade White
+  'Bambu Lab|PLA Basic|Green', // not a Bambu colour; Bambu Green is
+  'Bambu Lab|ASA|White Aero', // ASA Aero is a foaming variant, not plain ASA
+]);
+
+function tidy(entry) {
+  const { brand } = entry;
+  const renamed = RENAME[`${brand}|${entry.color}`];
+  if (renamed) entry.color = renamed;
+  entry.material = FOLD[brand]?.[entry.material] ?? entry.material;
+
+  // Bambu's basic-range gradients are listed under PLA Basic by the community
+  // database; they are a range of their own.
+  if (brand === 'Bambu Lab' && entry.material === 'PLA Basic' && entry.hexes) entry.material = 'PLA Basic Gradient';
+  // Clear is a translucent PETG, not one of the solid colours.
+  if (brand === 'Bambu Lab' && entry.material === 'PETG Basic' && /^Clear$/i.test(entry.color)) entry.material = 'PETG Translucent';
+
+  if (!KEEP.test(entry.material) || DROP.test(entry.material)) return null;
+  if (REDUNDANT_RANGES[brand]?.includes(entry.material)) return null;
+  // "HF Black" and "For AMS Blue" are the same colour as the plain one.
+  if (/^(HF|For AMS) /i.test(entry.color)) return null;
+  if (REMOVE.has(`${brand}|${entry.material}|${entry.color}`)) return null;
+  return entry;
+}
+
+// Hand-kept colours no source publishes (Elegoo's swatch table has no "Transparent").
+input = [...input, ...JSON.parse(await readFile(EXTRA, 'utf8'))];
+
 const byKey = new Map();
 let dropped = 0;
-for (const entry of input.map(normalise)) {
+for (const entry of input.map(normalise).map(tidy)) {
+  if (!entry) continue;
   if (!entry.hex) {
     dropped++;
     continue;
@@ -319,7 +369,15 @@ for (const entry of input.map(normalise)) {
   if (!seen || (PRIORITY[entry.source] ?? 0) > (PRIORITY[seen.source] ?? 0)) byKey.set(key, entry);
 }
 
-const catalog = [...byKey.values()].sort(
+// Within a range, a colour that another source lists under a second name with
+// the same hex, and that is the less authoritative of the two, is a duplicate.
+const hexKey = (e) => `${e.brand}|${e.material}|${e.hexes?.join('') ?? e.hex}`;
+const topRank = new Map();
+for (const e of byKey.values()) topRank.set(hexKey(e), Math.max(topRank.get(hexKey(e)) ?? 0, PRIORITY[e.source] ?? 0));
+
+const catalog = [...byKey.values()]
+  .filter((e) => (PRIORITY[e.source] ?? 0) >= topRank.get(hexKey(e)))
+  .sort(
   (a, b) => a.brand.localeCompare(b.brand) || a.material.localeCompare(b.material) || a.color.localeCompare(b.color),
 );
 

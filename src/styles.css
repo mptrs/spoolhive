@@ -34,12 +34,17 @@ body {
   color: var(--text);
   font-family: var(--body);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   overscroll-behavior-y: none;
 }
 
 #app { min-height: 100%; }
 
 button, input, select, textarea { font-family: inherit; font-size: inherit; color: inherit; }
+input, select, textarea { font-size: 16px; }
 button { cursor: pointer; }
 a { color: var(--accent); text-decoration: none; }
 /* Cards and rows are links too, but their text is content, not a link. */
@@ -202,7 +207,7 @@ a.card, a.slot, a.listrow, a.rowlink { color: var(--text); }
   border: 1px solid var(--line);
   border-radius: 11px;
   padding: 13px;
-  font-size: 13.5px;
+  font-size: 16px; /* under 16px makes iOS Safari zoom in on focus */
   outline: none;
 }
 

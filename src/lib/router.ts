@@ -13,6 +13,29 @@ export function query(): URLSearchParams {
   return new URLSearchParams(i >= 0 ? hash.slice(i + 1) : '');
 }
 
+/**
+ * How deep we are in this app's own history. Every entry we create is stamped
+ * with an index, so Back can tell "there is a screen of ours to return to" from
+ * "this was the first screen" (a deep link, a reload into an edit screen) -
+ * `history.length` cannot, it also counts whatever the tab visited before us.
+ */
+let depth = 0;
+
+function stamp(): void {
+  const s = history.state as { depth?: number } | null;
+  if (typeof s?.depth === 'number') {
+    depth = s.depth; // Back or Forward onto an entry we already stamped
+    return;
+  }
+  // A fresh entry: a link click or hash edit. The very first load starts at 0.
+  depth = stamped ? depth + 1 : 0;
+  stamped = true;
+  history.replaceState({ depth }, '');
+}
+let stamped = false;
+stamp();
+addEventListener('hashchange', stamp);
+
 export function useRoute(): string {
   const [path, setPath] = useState(current);
   useEffect(() => {
@@ -24,16 +47,26 @@ export function useRoute(): string {
 }
 
 export function navigate(to: string, { replace = false } = {}): void {
-  if (replace) location.replace(`#${to}`);
-  else location.hash = to;
+  if (!replace) {
+    location.hash = to;
+    return;
+  }
+  // Keep the depth: a replaced entry sits where the old one did.
+  history.replaceState({ depth }, '', `#${to}`);
+  dispatchEvent(new HashChangeEvent('hashchange'));
 }
 
 export function href(to: string): string {
   return `#${to}`;
 }
 
+/**
+ * Return to the previous screen. Only when there is none of ours to return to
+ * does it go to `fallback` - and then by replacing, so Back cannot bounce
+ * between the two. Never push a "back" link: that is what made Back loop.
+ */
 export function back(fallback = '/'): void {
-  if (history.length > 1) history.back();
+  if (depth > 0) history.back();
   else navigate(fallback, { replace: true });
 }
 

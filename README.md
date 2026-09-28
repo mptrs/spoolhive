@@ -47,16 +47,19 @@ immediately instead of waiting for a rebuild.
 
 ## The colour catalogue
 
-`src/catalog.generated.json` holds 572 colours with real hex values, so a swatch
-in the app matches what you saw when you bought the filament — 324 Bambu Lab
-across 36 ranges and 248 Elegoo across 28.
+`src/catalog.generated.json` holds 350 colours with real hex values, so a swatch
+in the app matches what you saw when you bought the filament — 194 Bambu Lab
+across 18 ranges and 156 Elegoo across 16. Only PLA, PETG, TPU and ASA ranges are
+kept; `scripts/build-catalog.mjs` cuts the rest, folds duplicate ranges and
+spellings together, and adds the hand-kept colours in `data/catalog-extra.json`
+(Elegoo's own table has no "Transparent", for one).
 
 Four sources, merged in this order of authority:
 
 | Source | What it gives |
 | --- | --- |
-| Bambu Lab's published hex tables | 191 official colours, 21 product lines, one PDF each |
-| elegoo.com | 229 colours: their own ranges, swatch table and swatch images |
+| Bambu Lab's published hex tables | official colours, one line per PDF, one PDF each |
+| elegoo.com | their own ranges, swatch table and swatch images |
 | [SpoolmanDB](https://github.com/Donkie/SpoolmanDB) | Broad community coverage, including co-extruded multi-colour |
 | [filamentcolors.xyz](https://filamentcolors.xyz) | Measured from printed swatches; fills what is left |
 

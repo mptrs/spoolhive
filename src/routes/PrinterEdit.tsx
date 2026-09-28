@@ -1,7 +1,7 @@
 import type { JSX } from 'preact';
 import { useState } from 'preact/hooks';
 import { useApp } from '../lib/store';
-import { back, navigate } from '../lib/router';
+import { back } from '../lib/router';
 import { totalSlots, type Printer } from '../lib/types';
 import { BackButton, Note } from '../components/ui';
 import { blankPrinter, deletePrinter, upsertPrinter } from '../lib/actions';
@@ -57,7 +57,7 @@ export function PrinterEdit({ id }: { id: string }): JSX.Element {
   const save = (): void => {
     const name = draft.name.trim() || model.label;
     upsertPrinter({ ...draft, name, amsUnits: Math.min(draft.amsUnits, model.maxUnits) });
-    navigate('/printers', { replace: true });
+    back('/printers');
   };
 
   return (

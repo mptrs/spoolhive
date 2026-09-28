@@ -58,6 +58,7 @@ export function BackButton({
   label,
   onBack,
 }: {
+  /** Where to land if there is no previous screen (a deep link or reload). */
   to?: string;
   label: string;
   /** For going back a step inside one screen, where the URL does not change. */
@@ -76,10 +77,10 @@ export function BackButton({
       href={to ? href(to) : '#'}
       aria-label={label}
       onClick={(e) => {
-        if (!to) {
-          e.preventDefault();
-          goBack();
-        }
+        // `to` is where to land when there is nothing to go back to. Following
+        // it as a plain link would push a new entry and trap Back in a loop.
+        e.preventDefault();
+        goBack(to);
       }}
     >
       <Icon name="chevronLeft" />
