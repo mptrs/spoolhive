@@ -1,0 +1,16 @@
+[
+ {
+  "brand": "Elegoo",
+  "material": "Rapid PETG",
+  "color": "Transparent",
+  "hex": "#DDE3E6",
+  "source": "manual"
+ },
+ {
+  "brand": "Bambu Lab",
+  "material": "PETG Translucent",
+  "color": "Clear",
+  "hex": "#DDE3E6",
+  "source": "manual"
+ }
+]

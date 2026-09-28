@@ -1,6 +1,6 @@
 import type { JSX } from 'preact';
 import { useApp } from '../lib/store';
-import { navigate } from '../lib/router';
+import { back } from '../lib/router';
 import { ColorPicker } from '../components/ColorPicker';
 import { BackButton } from '../components/ui';
 import { updateSpool } from '../lib/actions';
@@ -46,7 +46,7 @@ export function Recolor({ id }: { id: string }): JSX.Element {
           },
           `Recolour spool to ${picked.color}`,
         );
-        navigate(`/spool/${id}`, { replace: true });
+        back(`/spool/${id}`);
       }}
     />
   );
