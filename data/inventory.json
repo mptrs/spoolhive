@@ -18,6 +18,26 @@
   ],
   "spools": [
     {
+      "brand": "Elegoo",
+      "material": "PETG Translucent",
+      "colorName": "Olive Green",
+      "hex": "#5C7443",
+      "form": "spool",
+      "mounted": false,
+      "netWeightG": 1000,
+      "remainingPct": 5,
+      "sealed": false,
+      "openedAt": "2026-09-28T21:36:23.873Z",
+      "dryState": "dry",
+      "location": {
+        "kind": "ams",
+        "printer": "maker-bee",
+        "slot": 4
+      },
+      "id": "b4940e00-c757-4c78-b375-ffdd2bab41e1",
+      "addedAt": "2026-09-28T21:36:23.874Z"
+    },
+    {
       "brand": "Bambu Lab",
       "material": "PETG Translucent",
       "colorName": "Light Blue",
@@ -842,5 +862,5 @@
     }
   ],
   "emptySpools": 4,
-  "updatedAt": "2026-09-28T21:35:56.493Z"
+  "updatedAt": "2026-09-28T21:36:23.874Z"
 }
