@@ -19,6 +19,23 @@
   "spools": [
     {
       "brand": "Bambu Lab",
+      "material": "PLA Basic",
+      "colorName": "Jade White",
+      "hex": "#FFFFFF",
+      "form": "refill",
+      "mounted": false,
+      "netWeightG": 1000,
+      "remainingPct": 100,
+      "sealed": true,
+      "dryState": "dry",
+      "location": {
+        "kind": "storage"
+      },
+      "id": "3c87f499-1369-4bd2-b553-18523f3169c7",
+      "addedAt": "2026-09-28T21:22:50.417Z"
+    },
+    {
+      "brand": "Bambu Lab",
       "material": "TPU-95A",
       "colorName": "HF Black",
       "hex": "#101820",
@@ -647,5 +664,5 @@
     }
   ],
   "emptySpools": 4,
-  "updatedAt": "2026-09-28T21:22:20.687Z"
+  "updatedAt": "2026-09-28T21:22:50.418Z"
 }
