@@ -20,6 +20,23 @@
     {
       "brand": "Bambu Lab",
       "material": "PLA Matte",
+      "colorName": "Desert Tan",
+      "hex": "#E8DBB7",
+      "form": "refill",
+      "mounted": false,
+      "netWeightG": 1000,
+      "remainingPct": 100,
+      "sealed": true,
+      "dryState": "dry",
+      "location": {
+        "kind": "storage"
+      },
+      "id": "6db4f08b-15bd-4868-9479-b45ac72a8f0a",
+      "addedAt": "2026-09-28T21:15:31.596Z"
+    },
+    {
+      "brand": "Bambu Lab",
+      "material": "PLA Matte",
       "colorName": "Apple Green",
       "hex": "#C2E189",
       "form": "refill",
@@ -525,5 +542,5 @@
     }
   ],
   "emptySpools": 4,
-  "updatedAt": "2026-09-28T21:15:05.085Z"
+  "updatedAt": "2026-09-28T21:15:31.596Z"
 }
