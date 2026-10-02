@@ -412,7 +412,7 @@
       "form": "refill",
       "mounted": true,
       "netWeightG": 1000,
-      "remainingPct": 100,
+      "remainingPct": 7,
       "sealed": false,
       "openedAt": "2026-09-27T11:49:04.060Z",
       "dryState": "dry",
@@ -862,5 +862,5 @@
     }
   ],
   "emptySpools": 4,
-  "updatedAt": "2026-09-28T21:36:23.874Z"
+  "updatedAt": "2026-10-02T15:10:57.268Z"
 }
