@@ -146,8 +146,8 @@
     {
       "brand": "Elegoo",
       "material": "Rapid PETG",
-      "colorName": "White",
-      "hex": "#FFFFFF",
+      "colorName": "Transparent",
+      "hex": "#DDE3E6",
       "form": "spool",
       "mounted": false,
       "netWeightG": 1000,
@@ -862,5 +862,5 @@
     }
   ],
   "emptySpools": 4,
-  "updatedAt": "2026-10-02T15:11:37.327Z"
+  "updatedAt": "2026-10-02T15:11:57.922Z"
 }
