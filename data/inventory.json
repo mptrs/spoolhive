@@ -40,8 +40,8 @@
     {
       "brand": "Bambu Lab",
       "material": "PETG Translucent",
-      "colorName": "Light Blue",
-      "hex": "#61B0FF",
+      "colorName": "Clear",
+      "hex": "#DDE3E6",
       "form": "spool",
       "mounted": false,
       "netWeightG": 1000,
@@ -862,5 +862,5 @@
     }
   ],
   "emptySpools": 4,
-  "updatedAt": "2026-10-02T15:11:13.091Z"
+  "updatedAt": "2026-10-02T15:11:37.327Z"
 }
