@@ -19,6 +19,23 @@
   "spools": [
     {
       "brand": "Bambu Lab",
+      "material": "PLA Basic",
+      "colorName": "Beige",
+      "hex": "#F7E6DE",
+      "form": "refill",
+      "mounted": false,
+      "netWeightG": 1000,
+      "remainingPct": 100,
+      "sealed": true,
+      "dryState": "dry",
+      "location": {
+        "kind": "storage"
+      },
+      "id": "31c3c23a-8ab5-4edc-8366-bf63cb014f6f",
+      "addedAt": "2026-10-07T17:12:44.378Z"
+    },
+    {
+      "brand": "Bambu Lab",
       "material": "PLA Matte",
       "colorName": "Dark Green",
       "hex": "#68724D",
@@ -897,5 +914,5 @@
     }
   ],
   "emptySpools": 3,
-  "updatedAt": "2026-10-07T17:12:29.260Z"
+  "updatedAt": "2026-10-07T17:12:44.378Z"
 }
