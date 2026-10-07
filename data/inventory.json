@@ -18,6 +18,26 @@
   ],
   "spools": [
     {
+      "brand": "Bambu Lab",
+      "material": "PLA Matte",
+      "colorName": "Dark Green",
+      "hex": "#68724D",
+      "form": "refill",
+      "mounted": true,
+      "netWeightG": 1000,
+      "remainingPct": 100,
+      "sealed": false,
+      "openedAt": "2026-10-07T17:12:07.564Z",
+      "dryState": "dry",
+      "location": {
+        "kind": "ams",
+        "printer": "maker-bee",
+        "slot": 3
+      },
+      "id": "91f1acb2-af4f-48f7-be34-d94274287c04",
+      "addedAt": "2026-10-07T17:12:07.565Z"
+    },
+    {
       "brand": "Elegoo",
       "material": "PETG Translucent",
       "colorName": "Olive Green",
@@ -546,9 +566,7 @@
       "openedAt": "2026-09-22T13:35:09.650Z",
       "dryState": "dry",
       "location": {
-        "kind": "ams",
-        "printer": "maker-bee",
-        "slot": 3
+        "kind": "storage"
       },
       "id": "1fe8fc92-a359-4fcf-a3a2-01f9166dab8f",
       "addedAt": "2026-09-22T13:35:09.651Z"
@@ -861,6 +879,6 @@
       "addedAt": "2026-09-21T18:13:14.187Z"
     }
   ],
-  "emptySpools": 4,
-  "updatedAt": "2026-10-02T15:11:57.922Z"
+  "emptySpools": 3,
+  "updatedAt": "2026-10-07T17:12:07.565Z"
 }
