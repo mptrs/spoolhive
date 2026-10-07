@@ -23,6 +23,23 @@
       "colorName": "Dark Green",
       "hex": "#68724D",
       "form": "refill",
+      "mounted": false,
+      "netWeightG": 1000,
+      "remainingPct": 100,
+      "sealed": true,
+      "dryState": "dry",
+      "location": {
+        "kind": "storage"
+      },
+      "id": "8d0c5f8c-437f-4a0e-a08d-700f4dff0002",
+      "addedAt": "2026-10-07T17:12:29.259Z"
+    },
+    {
+      "brand": "Bambu Lab",
+      "material": "PLA Matte",
+      "colorName": "Dark Green",
+      "hex": "#68724D",
+      "form": "refill",
       "mounted": true,
       "netWeightG": 1000,
       "remainingPct": 100,
@@ -880,5 +897,5 @@
     }
   ],
   "emptySpools": 3,
-  "updatedAt": "2026-10-07T17:12:07.565Z"
+  "updatedAt": "2026-10-07T17:12:29.260Z"
 }
