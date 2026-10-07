@@ -31,6 +31,23 @@
       "location": {
         "kind": "storage"
       },
+      "id": "839a8f66-1f02-4228-8118-1944e76e75db",
+      "addedAt": "2026-10-07T17:12:57.947Z"
+    },
+    {
+      "brand": "Bambu Lab",
+      "material": "PLA Basic",
+      "colorName": "Beige",
+      "hex": "#F7E6DE",
+      "form": "refill",
+      "mounted": false,
+      "netWeightG": 1000,
+      "remainingPct": 100,
+      "sealed": true,
+      "dryState": "dry",
+      "location": {
+        "kind": "storage"
+      },
       "id": "31c3c23a-8ab5-4edc-8366-bf63cb014f6f",
       "addedAt": "2026-10-07T17:12:44.378Z"
     },
@@ -914,5 +931,5 @@
     }
   ],
   "emptySpools": 3,
-  "updatedAt": "2026-10-07T17:12:44.378Z"
+  "updatedAt": "2026-10-07T17:12:57.947Z"
 }
