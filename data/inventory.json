@@ -121,7 +121,8 @@
       "openedAt": "2026-09-28T21:35:25.782Z",
       "dryState": "dry",
       "location": {
-        "kind": "storage"
+        "kind": "direct",
+        "printer": "maker-ant"
       },
       "id": "f8ed0b79-9a76-4f5e-85b3-067d64c2a251",
       "addedAt": "2026-09-28T21:35:25.784Z",
@@ -926,5 +927,5 @@
     }
   ],
   "emptySpools": 3,
-  "updatedAt": "2026-10-10T22:16:06.422Z"
+  "updatedAt": "2026-10-10T22:16:13.339Z"
 }
