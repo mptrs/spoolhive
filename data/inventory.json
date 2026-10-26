@@ -190,7 +190,9 @@
       "sealed": false,
       "dryState": "dry",
       "location": {
-        "kind": "storage"
+        "kind": "ams",
+        "printer": "maker-bee",
+        "slot": 2
       },
       "id": "30278c5c-5a4e-4d27-af69-d8d3eec84765",
       "addedAt": "2026-09-28T21:32:08.416Z",
@@ -905,9 +907,7 @@
       "openedAt": "2026-09-22T05:10:15.260Z",
       "dryState": "dry",
       "location": {
-        "kind": "ams",
-        "printer": "maker-bee",
-        "slot": 2
+        "kind": "storage"
       },
       "id": "6201deaa-cb32-4b0a-b02d-a6039cc01f61",
       "addedAt": "2026-09-22T05:10:15.260Z"
@@ -932,5 +932,5 @@
     }
   ],
   "emptySpools": 2,
-  "updatedAt": "2026-10-26T16:26:52.017Z"
+  "updatedAt": "2026-10-26T16:26:55.100Z"
 }
