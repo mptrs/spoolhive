@@ -184,7 +184,7 @@
       "colorName": "Black",
       "hex": "#000000",
       "form": "refill",
-      "mounted": false,
+      "mounted": true,
       "netWeightG": 1000,
       "remainingPct": 100,
       "sealed": false,
@@ -931,6 +931,6 @@
       "addedAt": "2026-09-21T18:13:14.187Z"
     }
   ],
-  "emptySpools": 3,
-  "updatedAt": "2026-10-26T16:26:46.420Z"
+  "emptySpools": 2,
+  "updatedAt": "2026-10-26T16:26:52.017Z"
 }
