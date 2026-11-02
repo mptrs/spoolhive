@@ -808,13 +808,15 @@
       "mounted": false,
       "netWeightG": 1000,
       "remainingPct": 100,
-      "sealed": true,
+      "sealed": false,
       "dryState": "dry",
       "location": {
-        "kind": "storage"
+        "kind": "direct",
+        "printer": "maker-ant"
       },
       "id": "9b66ee99-fc62-4e94-a497-93e667d66ad9",
-      "addedAt": "2026-09-22T13:20:44.146Z"
+      "addedAt": "2026-09-22T13:20:44.146Z",
+      "openedAt": "2026-11-02T21:34:36.784Z"
     },
     {
       "brand": "Elegoo",
@@ -911,5 +913,5 @@
     }
   ],
   "emptySpools": 3,
-  "updatedAt": "2026-11-02T21:34:20.860Z"
+  "updatedAt": "2026-11-02T21:34:36.784Z"
 }
