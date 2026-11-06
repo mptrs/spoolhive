@@ -438,24 +438,6 @@
     },
     {
       "brand": "Bambu Lab",
-      "material": "PLA Matte",
-      "colorName": "Dark Green",
-      "hex": "#68724D",
-      "form": "refill",
-      "mounted": true,
-      "netWeightG": 1000,
-      "remainingPct": 0,
-      "sealed": false,
-      "openedAt": "2026-09-27T11:49:04.060Z",
-      "dryState": "dry",
-      "location": {
-        "kind": "storage"
-      },
-      "id": "1100f8d1-00b4-4df8-8775-4eb1f66a693a",
-      "addedAt": "2026-09-27T11:49:04.061Z"
-    },
-    {
-      "brand": "Bambu Lab",
       "material": "PLA Basic",
       "colorName": "White Jade",
       "hex": "#ECEADE",
@@ -894,6 +876,6 @@
       "addedAt": "2026-09-21T18:13:14.187Z"
     }
   ],
-  "emptySpools": 4,
-  "updatedAt": "2026-11-06T19:58:49.882Z"
+  "emptySpools": 5,
+  "updatedAt": "2026-11-06T19:58:57.951Z"
 }
