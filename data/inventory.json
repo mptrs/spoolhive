@@ -63,7 +63,9 @@
       "sealed": false,
       "dryState": "dry",
       "location": {
-        "kind": "storage"
+        "kind": "ams",
+        "printer": "maker-bee",
+        "slot": 1
       },
       "id": "8d0c5f8c-437f-4a0e-a08d-700f4dff0002",
       "addedAt": "2026-10-07T17:12:29.259Z",
@@ -878,5 +880,5 @@
     }
   ],
   "emptySpools": 4,
-  "updatedAt": "2026-11-06T20:09:33.108Z"
+  "updatedAt": "2026-11-06T20:09:38.480Z"
 }
