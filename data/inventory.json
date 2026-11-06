@@ -69,24 +69,6 @@
       "addedAt": "2026-10-07T17:12:29.259Z"
     },
     {
-      "brand": "Bambu Lab",
-      "material": "PLA Matte",
-      "colorName": "Dark Green",
-      "hex": "#68724D",
-      "form": "refill",
-      "mounted": true,
-      "netWeightG": 1000,
-      "remainingPct": 0,
-      "sealed": false,
-      "openedAt": "2026-10-07T17:12:07.564Z",
-      "dryState": "dry",
-      "location": {
-        "kind": "storage"
-      },
-      "id": "91f1acb2-af4f-48f7-be34-d94274287c04",
-      "addedAt": "2026-10-07T17:12:07.565Z"
-    },
-    {
       "brand": "Elegoo",
       "material": "PETG Translucent",
       "colorName": "Olive Green",
@@ -912,6 +894,6 @@
       "addedAt": "2026-09-21T18:13:14.187Z"
     }
   ],
-  "emptySpools": 3,
-  "updatedAt": "2026-11-06T19:57:52.321Z"
+  "emptySpools": 4,
+  "updatedAt": "2026-11-06T19:58:49.882Z"
 }
