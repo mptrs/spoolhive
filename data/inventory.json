@@ -904,12 +904,14 @@
       "openedAt": "2026-09-21T18:13:14.187Z",
       "dryState": "dry",
       "location": {
-        "kind": "storage"
+        "kind": "ams",
+        "printer": "maker-bee",
+        "slot": 3
       },
       "id": "174c1584-d03a-40f2-b5be-35a84e0735b8",
       "addedAt": "2026-09-21T18:13:14.187Z"
     }
   ],
   "emptySpools": 3,
-  "updatedAt": "2026-11-06T19:57:48.929Z"
+  "updatedAt": "2026-11-06T19:57:52.321Z"
 }
