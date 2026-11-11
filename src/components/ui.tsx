@@ -107,6 +107,7 @@ export function Note({
 
 export type IconName =
   | 'printer'
+  | 'loaded'
   | 'spool'
   | 'refill'
   | 'plus'
@@ -130,6 +131,13 @@ const PATHS: Record<IconName, JSX.Element> = {
       <path d="M6 9V3h12v6" />
       <rect x="3" y="9" width="18" height="7" rx="2" />
       <path d="M6 14h12v7H6z" />
+    </>
+  ),
+  /** A spool sitting in a printer: the mark the inventory uses for "loaded". */
+  loaded: (
+    <>
+      <rect x="4" y="3" width="16" height="9" rx="2" />
+      <path d="M7 12v4h10v-4M8 21h8M12 16v5" />
     </>
   ),
   spool: (

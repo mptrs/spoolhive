@@ -1,34 +1,23 @@
 import type { JSX } from 'preact';
+import { useState } from 'preact/hooks';
 import { canEdit, useApp } from '../lib/store';
 import { back, href } from '../lib/router';
-import { isLoaded, locationText, remainingGrams, type DryState } from '../lib/types';
-import { Bar, BackButton, Icon, Note, pctColor, swatchBackground } from '../components/ui';
-import {
-  decodeLocation,
-  deleteSpool,
-  encodeLocation,
-  locationOptions,
-  markEmpty,
-  mountRefill,
-  setLocation,
-  setSealed,
-  unloadSpool,
-  unmountRefill,
-  updateSpool,
-} from '../lib/actions';
+import { isLoaded, locationText, remainingGrams } from '../lib/types';
+import { BackButton, Icon, Note, Swatch } from '../components/ui';
+import { deleteSpool, markEmpty, recordPrint, setSealed, unloadSpool } from '../lib/actions';
 import { shortDate } from '../lib/util';
 
-const DRY_STATES: Array<{ id: DryState; label: string }> = [
-  { id: 'dry', label: 'Dry' },
-  { id: 'needs-drying', label: 'Needs drying' },
-  { id: 'drying', label: 'Drying now' },
-];
+function levelColour(pct: number): string {
+  return pct <= 15 ? 'var(--red)' : pct <= 30 ? 'var(--accent)' : 'var(--green)';
+}
 
 export function SpoolDetail({ id }: { id: string }): JSX.Element {
   const app = useApp();
   const { inv } = app;
   const writable = canEdit(app);
   const spool = inv.spools.find((s) => s.id === id);
+  const [grams, setGrams] = useState('');
+  const [lastPrint, setLastPrint] = useState<number | null>(null);
 
   if (!spool) {
     return (
@@ -44,299 +33,151 @@ export function SpoolDetail({ id }: { id: string }): JSX.Element {
     );
   }
 
+  const pct = spool.remainingPct;
+  const used = Number(grams);
+  const canSubtract = used > 0 && Number.isFinite(used);
   const grounded = spool.form === 'refill' && !spool.mounted;
-  // A refill with nothing to wind it onto can only sit in storage.
-  const options = grounded
-    ? locationOptions(inv.printers).filter((o) => o.value === 'storage')
-    : locationOptions(inv.printers);
-  const formValue = spool.form === 'spool' ? 'spool' : spool.mounted ? 'refill-mounted' : 'refill';
 
-  const onFormChange = (value: string): void => {
-    if (value === 'spool') {
-      if (spool.form === 'refill' && spool.mounted) unmountRefill(spool.id);
-      updateSpool(spool.id, { form: 'spool', mounted: false }, 'Spool type changed');
-    } else if (value === 'refill-mounted') {
-      updateSpool(spool.id, { form: 'refill' }, 'Spool type changed');
-      if (!spool.mounted) mountRefill(spool.id);
-    } else {
-      if (spool.mounted) unmountRefill(spool.id);
-      updateSpool(spool.id, { form: 'refill', mounted: false }, 'Spool type changed');
-    }
+  const submit = (e: Event): void => {
+    e.preventDefault();
+    if (!canSubtract) return;
+    recordPrint(spool.id, used);
+    setLastPrint(used);
+    setGrams('');
   };
 
   return (
     <div class="screen">
       <header class="topbar">
-        <BackButton label="Back" />
-        <div class="topbar__title">{writable ? 'Edit spool' : 'Spool'}</div>
-        {writable && (
-          <button type="button" class="btn btn--sm" onClick={() => back('/inventory')}>
-            Done
-          </button>
-        )}
+        <BackButton to="/inventory" label="Back" />
+        <div class="topbar__title">Spool</div>
       </header>
 
-      <div class="screen__body">
-        <div style={{ borderRadius: '16px', overflow: 'hidden', border: '1px solid var(--line)' }}>
-          {writable ? (
-            <a
-              href={href(`/recolor/${spool.id}`)}
-              aria-label="Change colour"
-              style={{ display: 'block', height: '76px', background: swatchBackground(spool.hex, spool.hexes) }}
-            />
-          ) : (
-            <div style={{ height: '76px', background: swatchBackground(spool.hex, spool.hexes) }} />
-          )}
-          <div class="row" style={{ background: 'var(--surface)', padding: '12px 14px' }}>
-            <div class="grow">
-              <div style={{ fontFamily: 'var(--display)', fontSize: '18px', fontWeight: 700 }}>{spool.colorName}</div>
-              <div class="muted" style={{ marginTop: '2px' }}>
-                {spool.brand} · {spool.material} · {spool.netWeightG} g
-              </div>
+      <div class="screen__body" style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
+        <div class="row" style={{ gap: '14px' }}>
+          <Swatch hex={spool.hex} hexes={spool.hexes} size={48} radius={24} />
+          <div class="grow">
+            <h1 style={{ margin: 0, fontSize: '24px', lineHeight: 1.15 }}>{spool.colorName}</h1>
+            <div style={{ fontSize: '13px', color: 'var(--dim)', marginTop: '2px' }}>
+              {spool.brand} · {spool.material}
             </div>
-            {(() => {
-              const swatchLabel = spool.hexes ? `${spool.hexes.length} colours` : spool.hex.toUpperCase();
-              const style = {
-                fontSize: '11.5px',
-                color: 'var(--dim)',
-                background: 'var(--surface-2)',
-                border: '1px solid var(--line)',
-                borderRadius: '7px',
-                padding: '5px 9px',
-              };
-              return writable ? (
-                <a href={href(`/recolor/${spool.id}`)} class="mono" style={style}>
-                  {swatchLabel}
-                </a>
-              ) : (
-                <span class="mono" style={style}>
-                  {swatchLabel}
-                </span>
-              );
-            })()}
           </div>
         </div>
 
-        <div style={{ marginTop: '16px' }}>
-          <div class="row" style={{ alignItems: 'baseline', gap: '8px' }}>
-            <label class="label grow" for="rem">
-              Remaining
-            </label>
-            <span class="mono" style={{ fontSize: '15px', color: pctColor(spool.remainingPct) }}>
-              {spool.remainingPct}%
+        <div class="stack" style={{ gap: '10px' }}>
+          <div class="row" style={{ alignItems: 'baseline' }}>
+            <span class="mono" style={{ fontSize: '34px', fontWeight: 500, color: spool.sealed ? 'var(--green-text)' : levelColour(pct) }}>
+              {pct}%
             </span>
-            <span class="muted">≈ {remainingGrams(spool)} g</span>
+            <span style={{ fontSize: '14px', color: 'var(--dim)' }}>
+              {spool.sealed ? 'sealed, full' : `≈ ${remainingGrams(spool)} g left`}
+            </span>
           </div>
-          {writable && spool.sealed && (
-            <div class="muted" style={{ marginTop: '6px' }}>
-              Sealed, so it counts as full. Mark it opened to set a level.
-            </div>
-          )}
-          {!writable && (
-            // .bar grows to fill a flex row, so it needs one to have any width.
-            <div class="row" style={{ marginTop: '12px' }}>
-              <Bar pct={spool.remainingPct} />
-            </div>
-          )}
-          {writable && (
-          <input
-            id="rem"
-            class="range"
-            type="range"
-            min={0}
-            max={100}
-            step={1}
-            disabled={spool.sealed}
-            value={spool.remainingPct}
-            style={{
-              marginTop: '14px',
-              // The track shows the same fill the bars elsewhere use.
-              '--track': `linear-gradient(90deg, ${
-                spool.remainingPct <= 15 ? '#d9594c' : spool.remainingPct <= 30 ? '#e8a33d' : '#4fb477'
-              } 0 ${spool.remainingPct}%, #0c0d10 ${spool.remainingPct}% 100%)`,
-            }}
-            onInput={(e) =>
-              updateSpool(spool.id, { remainingPct: Number((e.target as HTMLInputElement).value) }, 'Update remaining filament')
-            }
-          />
-          )}
-        </div>
-
-        <div style={{ marginTop: '14px' }}>
-          <span class="label" style={{ marginBottom: '8px' }}>
-            Packaging
-          </span>
-          {writable ? (
-            <div class="seg">
-              <button type="button" data-on={spool.sealed} onClick={() => setSealed(spool.id, true)}>
-                Sealed
-              </button>
-              <button type="button" data-on={!spool.sealed} onClick={() => setSealed(spool.id, false)}>
-                Opened
-              </button>
-            </div>
-          ) : (
-            <div class="card card--quiet" style={{ color: 'var(--text-2)', fontSize: '13px' }}>
-              {spool.sealed ? 'Sealed' : 'Opened'}
-            </div>
-          )}
-          {!spool.sealed && spool.openedAt && <div class="muted" style={{ marginTop: '7px' }}>Opened {shortDate(spool.openedAt)}</div>}
-        </div>
-
-        <div style={{ marginTop: '14px' }}>
-          <span class="label" style={{ marginBottom: '8px' }}>
-            Moisture
-          </span>
-          {spool.sealed ? (
-            <div class="card card--quiet muted">Still sealed, so it is dry. This matters once you open it.</div>
-          ) : !writable ? (
-            <div class="card card--quiet" style={{ color: 'var(--text-2)', fontSize: '13px' }}>
-              {DRY_STATES.find((d) => d.id === spool.dryState)?.label ?? spool.dryState}
-            </div>
-          ) : (
-          <div class="row" style={{ gap: '7px' }}>
-            {DRY_STATES.map((d) => (
-              <button
-                key={d.id}
-                type="button"
-                class="chip"
-                data-on={spool.dryState === d.id}
-                style={{ flexGrow: 1, textAlign: 'center' }}
-                onClick={() =>
-                  updateSpool(
-                    spool.id,
-                    { dryState: d.id, driedAt: d.id === 'dry' ? new Date().toISOString() : spool.driedAt },
-                    'Update moisture state',
-                  )
-                }
-              >
-                {d.label}
-              </button>
-            ))}
+          <div style={{ height: '8px', borderRadius: '4px', background: 'var(--surface-3)', overflow: 'hidden' }}>
+            <div style={{ height: '100%', width: `${pct}%`, background: spool.sealed ? 'var(--green)' : levelColour(pct) }} />
           </div>
-          )}
         </div>
 
-        <div class="row" style={{ marginTop: '14px', gap: '10px', alignItems: 'flex-start' }}>
-          <div class="grow">
-            <label class="label" for="loc" style={{ marginBottom: '8px' }}>
-              Location
+        {writable && (
+          <form class="stack" style={{ gap: '8px' }} onSubmit={submit}>
+            <label class="label" for="used">
+              Print done
             </label>
-            {writable ? (
-              <select
-                id="loc"
-                class="field"
-                value={encodeLocation(spool.location)}
-                onChange={(e) => setLocation(spool.id, decodeLocation((e.target as HTMLSelectElement).value))}
-              >
-                {options.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <div class="card card--quiet" style={{ color: 'var(--text-2)', fontSize: '13px' }}>
-                {locationText(inv, spool.location)}
+            <div class="printdone">
+              <div class="printdone__field">
+                <input
+                  id="used"
+                  type="number"
+                  inputMode="decimal"
+                  min={0}
+                  step="any"
+                  placeholder="Weight from Bambu Studio"
+                  value={grams}
+                  onInput={(e) => setGrams((e.target as HTMLInputElement).value)}
+                />
+                <span style={{ color: 'var(--faint)', fontSize: '14px' }}>g</span>
               </div>
-            )}
-          </div>
-          <div class="grow">
-            <label class="label" for="form" style={{ marginBottom: '8px' }}>
-              Spool
-            </label>
-            {writable ? (
-              <select id="form" class="field" value={formValue} onChange={(e) => onFormChange((e.target as HTMLSelectElement).value)}>
-                <option value="spool">On its own spool</option>
-                <option value="refill-mounted">Refill on reusable</option>
-                <option value="refill">Refill, no spool</option>
-              </select>
-            ) : (
-              <div class="card card--quiet" style={{ color: 'var(--text-2)', fontSize: '13px' }}>
-                {formValue === 'spool' ? 'On its own spool' : formValue === 'refill-mounted' ? 'Refill on reusable' : 'Refill, no spool'}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {writable && isLoaded(spool) && (
-          <button
-            type="button"
-            class="btn btn--ghost btn--block row"
-            style={{ marginTop: '12px', justifyContent: 'center', gap: '9px' }}
-            onClick={() => unloadSpool(spool.id)}
-          >
-            <Icon name="eject" size={16} />
-            <span>Take out of {locationText(inv, spool.location)}</span>
-          </button>
+              <button type="submit" class="printdone__go" aria-label="Subtract from spool" disabled={!canSubtract}>
+                <Icon name="check" size={22} />
+              </button>
+            </div>
+            {lastPrint !== null && <span class="muted" style={{ fontSize: '12px' }}>Last print: −{lastPrint} g</span>}
+          </form>
         )}
+
+        <div class="detailrows">
+          {isLoaded(spool) ? (
+            <div class="detailrow">
+              <span style={{ color: 'var(--accent)', display: 'flex' }}>
+                <Icon name="loaded" />
+              </span>
+              <span class="grow">{locationText(inv, spool.location)}</span>
+              {writable && (
+                <button type="button" class="btn btn--ghost btn--row" onClick={() => unloadSpool(spool.id)}>
+                  Take out
+                </button>
+              )}
+            </div>
+          ) : (
+            <div class="detailrow">
+              <Icon name="spool" />
+              <span class="grow">{locationText(inv, spool.location)}</span>
+            </div>
+          )}
+
+          <div class="detailrow">
+            <Icon name="lock" />
+            <span class="grow">{spool.sealed ? 'Sealed' : 'Opened'}</span>
+            {!spool.sealed && spool.openedAt && <span class="detailrow__aside">since {shortDate(spool.openedAt)}</span>}
+            {writable && spool.sealed && (
+              <button type="button" class="btn btn--ghost btn--row" onClick={() => setSealed(spool.id, false)}>
+                Open it
+              </button>
+            )}
+          </div>
+
+          {writable && (
+            <a class="detailrow" href={href(`/recolor/${spool.id}`)}>
+              <Icon name="spool" />
+              <span class="grow">Change colour</span>
+              <Icon name="chevronRight" size={16} />
+            </a>
+          )}
+        </div>
 
         {grounded && (
-          <div style={{ marginTop: '12px' }}>
-            <Note tone="warn" icon="warn">
-              A refill with no spool under it can only sit in storage.{' '}
-              {inv.emptySpools === 0
-                ? 'No empty spools are free.'
-                : `${inv.emptySpools} empty ${inv.emptySpools === 1 ? 'spool is' : 'spools are'} free.`}
-              {writable && (
-                <>
-                  {' '}
-                  <a href={href('/refills')}>Mount it</a>
-                </>
-              )}
-            </Note>
-          </div>
-        )}
-
-        {(writable || spool.notes) && (
-          <div style={{ marginTop: '14px' }}>
-            <label class="label" for="notes" style={{ marginBottom: '8px' }}>
-              Notes
-            </label>
-            {writable ? (
-              <textarea
-                id="notes"
-                class="field"
-                rows={2}
-                placeholder="Print settings, quirks, where it came from"
-                value={spool.notes ?? ''}
-                onChange={(e) => updateSpool(spool.id, { notes: (e.target as HTMLTextAreaElement).value }, 'Update spool notes')}
-              />
-            ) : (
-              <div class="card card--quiet" style={{ color: 'var(--text-2)', fontSize: '13px', lineHeight: 1.45, whiteSpace: 'pre-line' }}>
-                {spool.notes}
-              </div>
+          <Note tone="warn" icon="warn">
+            A refill with no spool under it can only sit in storage.{' '}
+            {inv.emptySpools === 0
+              ? 'No empty spools are free.'
+              : `${inv.emptySpools} empty ${inv.emptySpools === 1 ? 'spool is' : 'spools are'} free.`}
+            {writable && (
+              <>
+                {' '}
+                <a href={href('/refills')}>Mount it</a>
+              </>
             )}
-          </div>
+          </Note>
         )}
 
         {writable && (
-          <>
-            <div class="row" style={{ gap: '9px', marginTop: '16px' }}>
-              <button type="button" class="btn btn--ghost grow" onClick={() => markEmpty(spool.id)}>
-                Mark empty
-              </button>
-              <button
-                type="button"
-                class="btn btn--danger grow"
-                onClick={() => {
-                  if (confirm(`Remove ${spool.colorName} from the inventory?`)) {
-                    deleteSpool(spool.id);
-                    back('/inventory');
-                  }
-                }}
-              >
-                Remove
-              </button>
-            </div>
-
-            <div class="row" style={{ justifyContent: 'center', gap: '7px', margin: '16px 0 8px', color: 'var(--faint)' }}>
-              <Icon name="github" size={13} />
-              <span style={{ fontSize: '11px' }}>
-                Every change commits to <span class="mono">inventory.json</span>
-              </span>
-            </div>
-          </>
+          <div class="row" style={{ gap: '9px', marginTop: 'auto' }}>
+            <button type="button" class="btn btn--ghost grow" onClick={() => markEmpty(spool.id)}>
+              Mark empty
+            </button>
+            <button
+              type="button"
+              class="btn btn--danger grow"
+              onClick={() => {
+                if (confirm(`Remove ${spool.colorName} from the inventory?`)) {
+                  deleteSpool(spool.id);
+                  back('/inventory');
+                }
+              }}
+            >
+              Remove
+            </button>
+          </div>
         )}
       </div>
     </div>

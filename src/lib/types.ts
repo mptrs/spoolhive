@@ -91,7 +91,7 @@ export function remainingGrams(s: Spool): number {
  * The rules, and why:
  *  - A sealed spool is unopened, so it is full, dry, has no opened date, and
  *    cannot be in a printer. Loading or emptying one opens it first.
- *  - `mounted` only means anything for a refill.
+ *  - `mounted` only means anything for a refill, and a mounted refill is open.
  *  - A refill with no spool under it physically cannot be in a printer.
  *  - One slot holds one spool.
  */
@@ -102,6 +102,12 @@ export function reconcile(inv: Inventory): void {
     spool.remainingPct = Math.max(0, Math.min(100, Math.round(spool.remainingPct)));
 
     if (spool.form === 'spool') spool.mounted = false;
+
+    // A refill wound onto a spool is out of its bag.
+    if (spool.form === 'refill' && spool.mounted && spool.sealed) {
+      spool.sealed = false;
+      spool.openedAt = spool.openedAt ?? new Date().toISOString();
+    }
 
     if (spool.form === 'refill' && !spool.mounted && spool.location.kind !== 'storage') {
       spool.location = { kind: 'storage' };

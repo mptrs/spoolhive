@@ -120,7 +120,8 @@ function normalise(entry) {
   material = FAMILY[brand]?.[material] ?? material;
 
   const doubled = REDUNDANT.exec(color);
-  if (doubled && new RegExp(`\\b${doubled[1]}\\b`, 'i').test(material)) {
+  // Hand-kept names are spelled as meant ("Wood Filled" is not "Filled").
+  if (doubled && entry.source !== 'manual' && new RegExp(`\\b${doubled[1]}\\b`, 'i').test(material)) {
     const rest = color.slice(doubled[0].length).trim();
     if (rest) color = rest;
   }
@@ -345,6 +346,14 @@ function tidy(entry) {
   // Clear is a translucent PETG, not one of the solid colours.
   if (brand === 'Bambu Lab' && entry.material === 'PETG Basic' && /^Clear$/i.test(entry.color)) entry.material = 'PETG Translucent';
 
+  // "Midnight Blaze (Blue-Red)", "Brown (Brown base with gold shimmer)": the
+  // bracket describes what the swatch already shows, and only some sources add it.
+  entry.color = entry.color.replace(/\s*\([^)]*\)\s*$/, '');
+  // Bambu name the metals "Cobalt Blue Metallic"; a community "Metallic Cobalt Blue" is the same spool.
+  if (entry.material === 'PLA Metal') entry.color = entry.color.replace(/^Metallic (.+)$/i, '$1 Metallic');
+  // "Red/Green" and "Green Red" are one dual silk; the slash is just another spelling.
+  entry.color = entry.color.replace(/\s*\/\s*/g, ' ');
+
   if (!KEEP.test(entry.material) || DROP.test(entry.material)) return null;
   if (REDUNDANT_RANGES[brand]?.includes(entry.material)) return null;
   // "HF Black" and "For AMS Blue" are the same colour as the plain one.
@@ -364,7 +373,10 @@ for (const entry of input.map(normalise).map(tidy)) {
     dropped++;
     continue;
   }
-  const key = `${entry.brand}|${entry.material}|${entry.color}`.toLowerCase();
+  // Word order does not make a different colour: a dual silk is listed both
+  // ways round. The most authoritative source's spelling is the one kept.
+  const words = entry.color.toLowerCase().split(' ').sort().join(' ');
+  const key = `${entry.brand}|${entry.material}|${words}`;
   const seen = byKey.get(key);
   if (!seen || (PRIORITY[entry.source] ?? 0) > (PRIORITY[seen.source] ?? 0)) byKey.set(key, entry);
 }

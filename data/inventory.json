@@ -285,8 +285,8 @@
     },
     {
       "brand": "Bambu Lab",
-      "material": "TPU-95A",
-      "colorName": "HF Black",
+      "material": "TPU",
+      "colorName": "Black",
       "hex": "#101820",
       "form": "spool",
       "mounted": false,
@@ -449,8 +449,8 @@
     {
       "brand": "Bambu Lab",
       "material": "PLA Basic",
-      "colorName": "White Jade",
-      "hex": "#ECEADE",
+      "colorName": "Jade White",
+      "hex": "#FFFFFF",
       "form": "refill",
       "mounted": true,
       "netWeightG": 1000,
@@ -485,7 +485,7 @@
     },
     {
       "brand": "Elegoo",
-      "material": "PLA",
+      "material": "PLA Metal",
       "colorName": "Bronze Filled",
       "hex": "#895837",
       "form": "spool",
@@ -647,7 +647,7 @@
     },
     {
       "brand": "Elegoo",
-      "material": "PLA",
+      "material": "PLA Wood",
       "colorName": "Wood Filled",
       "hex": "#9D8058",
       "form": "spool",
@@ -792,7 +792,7 @@
     },
     {
       "brand": "Elegoo",
-      "material": "PLA",
+      "material": "PLA Basic",
       "colorName": "White",
       "hex": "#FFFFFF",
       "form": "spool",
@@ -810,7 +810,7 @@
     },
     {
       "brand": "Elegoo",
-      "material": "PLA",
+      "material": "PLA Basic",
       "colorName": "Red",
       "hex": "#EA140E",
       "form": "spool",
@@ -828,7 +828,7 @@
     },
     {
       "brand": "Elegoo",
-      "material": "PLA",
+      "material": "PLA Basic",
       "colorName": "Neon Green",
       "hex": "#02E601",
       "form": "spool",

@@ -468,7 +468,7 @@
  {
   "brand": "Bambu Lab",
   "material": "PLA Basic Gradient",
-  "color": "Aurora Purple (Blue-Purple)",
+  "color": "Aurora Purple",
   "hex": "#7F3696",
   "hexes": [
    "#7F3696",
@@ -479,7 +479,7 @@
  {
   "brand": "Bambu Lab",
   "material": "PLA Basic Gradient",
-  "color": "Blue Hawaii (Blue-Green)",
+  "color": "Blue Hawaii",
   "hex": "#60A4E8",
   "hexes": [
    "#60A4E8",
@@ -536,7 +536,7 @@
  {
   "brand": "Bambu Lab",
   "material": "PLA Basic Gradient",
-  "color": "Gilded Rose (Pink-Gold)",
+  "color": "Gilded Rose",
   "hex": "#FF9425",
   "hexes": [
    "#FF9425",
@@ -547,7 +547,7 @@
  {
   "brand": "Bambu Lab",
   "material": "PLA Basic Gradient",
-  "color": "Midnight Blaze (Blue-Red)",
+  "color": "Midnight Blaze",
   "hex": "#0047BB",
   "hexes": [
    "#0047BB",
@@ -569,7 +569,7 @@
  {
   "brand": "Bambu Lab",
   "material": "PLA Basic Gradient",
-  "color": "Neon City (Blue-Magenta)",
+  "color": "Neon City",
   "hex": "#0047BB",
   "hexes": [
    "#0047BB",
@@ -624,7 +624,7 @@
  {
   "brand": "Bambu Lab",
   "material": "PLA Basic Gradient",
-  "color": "Velvet Eclipse (Black-Red)",
+  "color": "Velvet Eclipse",
   "hex": "#000000",
   "hexes": [
    "#000000",
@@ -635,14 +635,14 @@
  {
   "brand": "Bambu Lab",
   "material": "PLA Galaxy",
-  "color": "Brown (Brown base with gold shimmer)",
+  "color": "Brown",
   "hex": "#684A43",
   "source": "bambu-official"
  },
  {
   "brand": "Bambu Lab",
   "material": "PLA Galaxy",
-  "color": "Green (Green base with gold shimmer)",
+  "color": "Green",
   "hex": "#3B665E",
   "source": "bambu-official"
  },
@@ -650,13 +650,6 @@
   "brand": "Bambu Lab",
   "material": "PLA Galaxy",
   "color": "Nebulae",
-  "hex": "#495758",
-  "source": "filamentcolors.xyz"
- },
- {
-  "brand": "Bambu Lab",
-  "material": "PLA Galaxy",
-  "color": "Nebulae (Deep blue base with green shimmer)",
   "hex": "#424379",
   "source": "bambu-official"
  },
@@ -664,13 +657,6 @@
   "brand": "Bambu Lab",
   "material": "PLA Galaxy",
   "color": "Purple",
-  "hex": "#4C5763",
-  "source": "filamentcolors.xyz"
- },
- {
-  "brand": "Bambu Lab",
-  "material": "PLA Galaxy",
-  "color": "Purple (Purple base with blue shimmer)",
   "hex": "#594177",
   "source": "bambu-official"
  },
@@ -988,13 +974,6 @@
   "color": "Iron Gray Metallic",
   "hex": "#43403D",
   "source": "bambu-official"
- },
- {
-  "brand": "Bambu Lab",
-  "material": "PLA Metal",
-  "color": "Metallic Cobalt Blue",
-  "hex": "#5A7B8C",
-  "source": "filamentcolors.xyz"
  },
  {
   "brand": "Bambu Lab",
@@ -1678,6 +1657,13 @@
  {
   "brand": "Elegoo",
   "material": "PLA Basic",
+  "color": "Neon Green",
+  "hex": "#02E601",
+  "source": "manual"
+ },
+ {
+  "brand": "Elegoo",
+  "material": "PLA Basic",
   "color": "Orange",
   "hex": "#FD7C18",
   "source": "elegoo.com"
@@ -1887,6 +1873,13 @@
  },
  {
   "brand": "Elegoo",
+  "material": "PLA Metal",
+  "color": "Bronze Filled",
+  "hex": "#895837",
+  "source": "manual"
+ },
+ {
+  "brand": "Elegoo",
   "material": "PLA Silk",
   "color": "Black Purple",
   "hex": "#281240",
@@ -2007,13 +2000,6 @@
   "color": "Red",
   "hex": "#ED646B",
   "source": "spoolmandb"
- },
- {
-  "brand": "Elegoo",
-  "material": "PLA Silk",
-  "color": "Red/Green",
-  "hex": "#716C56",
-  "source": "filamentcolors.xyz"
  },
  {
   "brand": "Elegoo",
@@ -2147,6 +2133,13 @@
   "color": "Walnut Wood",
   "hex": "#77504A",
   "source": "elegoo.com"
+ },
+ {
+  "brand": "Elegoo",
+  "material": "PLA Wood",
+  "color": "Wood Filled",
+  "hex": "#9D8058",
+  "source": "manual"
  },
  {
   "brand": "Elegoo",
