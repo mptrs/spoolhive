@@ -394,7 +394,7 @@
       "colorName": "Desert Tan",
       "hex": "#E8DBB7",
       "form": "refill",
-      "mounted": false,
+      "mounted": true,
       "netWeightG": 1000,
       "remainingPct": 100,
       "sealed": true,
@@ -411,7 +411,7 @@
       "colorName": "Apple Green",
       "hex": "#C2E189",
       "form": "refill",
-      "mounted": false,
+      "mounted": true,
       "netWeightG": 1000,
       "remainingPct": 100,
       "sealed": true,
@@ -875,6 +875,6 @@
       "addedAt": "2026-09-21T18:13:14.187Z"
     }
   ],
-  "emptySpools": 3,
-  "updatedAt": "2026-11-11T10:36:39.416Z"
+  "emptySpools": 1,
+  "updatedAt": "2026-11-11T10:37:33.204Z"
 }
