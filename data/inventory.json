@@ -431,13 +431,16 @@
       "mounted": true,
       "netWeightG": 1000,
       "remainingPct": 100,
-      "sealed": true,
+      "sealed": false,
       "dryState": "dry",
       "location": {
-        "kind": "storage"
+        "kind": "ams",
+        "printer": "maker-bee",
+        "slot": 3
       },
       "id": "4231a824-fd9d-4263-a912-4731dd0660b0",
-      "addedAt": "2026-09-28T21:14:42.674Z"
+      "addedAt": "2026-09-28T21:14:42.674Z",
+      "openedAt": "2026-11-11T10:37:55.638Z"
     },
     {
       "brand": "Bambu Lab",
@@ -876,5 +879,5 @@
     }
   ],
   "emptySpools": 0,
-  "updatedAt": "2026-11-11T10:37:37.026Z"
+  "updatedAt": "2026-11-11T10:37:55.638Z"
 }
