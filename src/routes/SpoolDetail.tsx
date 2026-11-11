@@ -11,7 +11,7 @@ function levelColour(pct: number): string {
   return pct <= 15 ? 'var(--red)' : pct <= 30 ? 'var(--accent)' : 'var(--green)';
 }
 
-export function SpoolDetail({ id }: { id: string }): JSX.Element {
+export function SpoolDetail({ id, embedded = false }: { id: string; embedded?: boolean }): JSX.Element {
   const app = useApp();
   const { inv } = app;
   const writable = canEdit(app);
@@ -21,11 +21,13 @@ export function SpoolDetail({ id }: { id: string }): JSX.Element {
 
   if (!spool) {
     return (
-      <div class="screen">
-        <header class="topbar">
-          <BackButton to="/inventory" label="Back to inventory" />
-          <div class="topbar__title">Spool</div>
-        </header>
+      <div class={embedded ? 'screen screen--embedded' : 'screen'}>
+        {!embedded && (
+          <header class="topbar">
+            <BackButton to="/inventory" label="Back to inventory" />
+            <div class="topbar__title">Spool</div>
+          </header>
+        )}
         <div class="screen__body">
           <div class="empty">That spool is no longer in the inventory.</div>
         </div>
@@ -47,11 +49,13 @@ export function SpoolDetail({ id }: { id: string }): JSX.Element {
   };
 
   return (
-    <div class="screen">
-      <header class="topbar">
-        <BackButton to="/inventory" label="Back" />
-        <div class="topbar__title">Spool</div>
-      </header>
+    <div class={embedded ? 'screen screen--embedded' : 'screen'}>
+      {!embedded && (
+        <header class="topbar">
+          <BackButton to="/inventory" label="Back" />
+          <div class="topbar__title">Spool</div>
+        </header>
+      )}
 
       <div class="screen__body" style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
         <div class="row" style={{ gap: '14px' }}>
