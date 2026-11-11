@@ -128,9 +128,12 @@ export type IconName =
 const PATHS: Record<IconName, JSX.Element> = {
   printer: (
     <>
-      <path d="M6 9V3h12v6" />
-      <rect x="3" y="9" width="18" height="7" rx="2" />
-      <path d="M6 14h12v7H6z" />
+      {/* An enclosed FDM printer: frame, gantry, nozzle, print on the bed. */}
+      <rect x="3.5" y="3" width="17" height="18" rx="2" />
+      <path d="M3.5 7.5h17" />
+      <path d="M10 7.5v2.5h4V7.5M12 10v2" />
+      <path d="M7 17h10" />
+      <path d="M9.5 17v-2h5v2" />
     </>
   ),
   /** A spool sitting in a printer: the mark the inventory uses for "loaded". */

@@ -5,6 +5,7 @@ import { totalSlots, type Printer, type Spool } from '../lib/types';
 import { Bar, Icon, Note, Swatch, TabBar, pctColor } from '../components/ui';
 import { unloadSpool } from '../lib/actions';
 import { relativeTime } from '../lib/util';
+import { colourGroups } from '../lib/stock';
 
 const LOW_PCT = 15;
 
@@ -14,7 +15,8 @@ export function Printers(): JSX.Element {
   const writable = canEdit(app);
 
   const loaded = inv.spools.filter((s) => s.location.kind !== 'storage');
-  const low = loaded.filter((s) => s.remainingPct <= LOW_PCT);
+  // Low means no sealed spare of that colour either - a nearly empty roll with a fresh one on the shelf is just a swap.
+  const low = colourGroups(inv.spools).filter((g) => g.low && g.loaded);
   const stored = inv.spools.length - loaded.length;
   const refillsWaiting = inv.spools.filter((s) => s.form === 'refill' && !s.mounted).length;
 
@@ -22,7 +24,7 @@ export function Printers(): JSX.Element {
   const syncTone = !online ? 'var(--faint)' : pending > 0 || syncing ? 'var(--accent)' : 'var(--green)';
 
   return (
-    <div class="screen screen--tabbed">
+    <div class="screen screen--tabbed screen--wide">
       <header class="topbar">
         <div class="grow">
           <h1>Spoolhive</h1>
@@ -31,11 +33,11 @@ export function Printers(): JSX.Element {
             {inv.printers.length === 1 ? 'printer' : 'printers'}
           </div>
         </div>
-        <div class="syncchip" title={`Last synced ${relativeTime(lastSync)}`}>
+        <div class="syncchip desktop-hide" title={`Last synced ${relativeTime(lastSync)}`}>
           <span class="dot" style={{ background: syncTone }} />
           <span>{syncLabel}</span>
         </div>
-        <a class="iconbtn" href={href('/connect')} aria-label="Sync settings">
+        <a class="iconbtn desktop-hide" href={href('/connect')} aria-label="Sync settings">
           <Icon name="gear" size={17} />
         </a>
       </header>
@@ -44,10 +46,10 @@ export function Printers(): JSX.Element {
         {low.length > 0 && (
           <Note tone="bad" icon="warn">
             <strong style={{ display: 'block', fontSize: '13px' }}>
-              {low.length} {low.length === 1 ? 'spool is' : 'spools are'} running low
+              {low.length} {low.length === 1 ? 'colour is' : 'colours are'} running low
             </strong>
             <span style={{ color: 'var(--dim)' }}>
-              {low.map((s) => `${s.colorName} (${s.remainingPct}%)`).join(', ')}
+              {low.map((g) => `${g.colorName} (${Math.round(g.openPct)}%)`).join(', ')}
             </span>
           </Note>
         )}
@@ -68,9 +70,11 @@ export function Printers(): JSX.Element {
           </div>
         )}
 
-        {inv.printers.map((p) => (
-          <PrinterCard key={p.id} printer={p} spools={inv.spools} writable={writable} />
-        ))}
+        <div class="printers">
+          {inv.printers.map((p) => (
+            <PrinterCard key={p.id} printer={p} spools={inv.spools} writable={writable} />
+          ))}
+        </div>
 
         <a class="card stats" href={href('/inventory')}>
           <div>
@@ -91,7 +95,7 @@ export function Printers(): JSX.Element {
           </div>
         </a>
 
-        <a class="card card--quiet rowlink" href={href('/printers')}>
+        <a class="card card--quiet rowlink desktop-hide" href={href('/printers')}>
           <Icon name="printer" size={17} />
           <span class="grow" style={{ fontSize: '13px', color: 'var(--text-2)' }}>
             {writable ? 'Manage printers' : 'Printers'}
@@ -126,7 +130,7 @@ function PrinterCard({
   });
 
   return (
-    <section class="card">
+    <section class="card" style={{ '--slots': Math.min(count, 4) } as JSX.CSSProperties}>
       <a class="rowlink" href={href(`/printer/${printer.id}`)} style={{ marginBottom: '12px' }}>
         <span class="dot" style={{ background: 'var(--green)' }} />
         <span class="grow">
@@ -140,7 +144,7 @@ function PrinterCard({
         <Icon name="chevronRight" size={16} />
       </a>
 
-      <div class="grid-slots" style={{ gridTemplateColumns: `repeat(${count > 1 ? 2 : 1}, minmax(0, 1fr))` }}>
+      <div class="grid-slots" data-single={count === 1}>
         {slots.map((spool, i) => (
           <SlotTile key={i} printer={printer} slot={i + 1} spool={spool} writable={writable} />
         ))}

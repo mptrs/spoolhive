@@ -13,12 +13,26 @@ import { PrinterEdit } from './routes/PrinterEdit';
 import { LoadSlot } from './routes/LoadSlot';
 import { Recolor } from './routes/Recolor';
 import { Connect } from './routes/Connect';
+import { Sidebar } from './components/Sidebar';
+import { useWide } from './lib/viewport';
 
 /** Routes that exist only to change something; there is nothing to see on them. */
 const EDIT_ONLY = ['/add', '/printer/:id', '/load/:printer/:slot', '/recolor/:id'];
 
 export function App(): JSX.Element {
   const path = useRoute();
+  return (
+    <div class="shell">
+      <Sidebar path={path} />
+      <div class="shell__main">
+        <Routes path={path} />
+      </div>
+    </div>
+  );
+}
+
+function Routes({ path }: { path: string }): JSX.Element {
+  const wide = useWide();
   const app = useApp();
   const { loading, inv } = app;
   const writable = canEdit(app);
@@ -43,6 +57,8 @@ export function App(): JSX.Element {
   }
 
   const spool = match('/spool/:id', path);
+  // With room to spare, a spool opens beside the list instead of replacing it.
+  if (spool && wide) return <Inventory selected={spool.id} />;
   if (spool) return <SpoolDetail id={spool.id} />;
 
   const printer = match('/printer/:id', path);
@@ -56,7 +72,7 @@ export function App(): JSX.Element {
 
   switch (path) {
     case '/inventory':
-      return <Inventory />;
+      return <Inventory selected={null} />;
     case '/reorder':
       return <Reorder />;
     case '/add':

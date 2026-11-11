@@ -5,9 +5,12 @@ import { href } from '../lib/router';
 import { colourGroups, families, type ColourGroup } from '../lib/stock';
 import { locationText, type Inventory as Inv, type Spool } from '../lib/types';
 import { Icon, Swatch, TabBar } from '../components/ui';
+import { SpoolDetail } from './SpoolDetail';
+import { useWide } from '../lib/viewport';
 
-export function Inventory(): JSX.Element {
+export function Inventory({ selected }: { selected: string | null }): JSX.Element {
   const app = useApp();
+  const wide = useWide();
   const { inv } = app;
   const writable = canEdit(app);
   const [query, setQuery] = useState('');
@@ -30,8 +33,8 @@ export function Inventory(): JSX.Element {
   const sealed = inv.spools.filter((s) => s.sealed).length;
   const grams = inv.spools.reduce((sum, s) => sum + (s.netWeightG * s.remainingPct) / 100, 0);
 
-  return (
-    <div class="screen screen--tabbed">
+  const list = (
+    <div class="screen screen--tabbed screen--wide">
       <header class="topbar" style={{ display: 'block', borderBottom: '1px solid var(--line-soft)' }}>
         <h1 style={{ margin: 0 }}>Inventory</h1>
         <div class="mono" style={{ fontSize: '11.5px', color: 'var(--faint)', marginTop: '3px' }}>
@@ -120,15 +123,18 @@ export function Inventory(): JSX.Element {
                 {f.sealed} sealed · {f.spools - f.sealed} open
               </div>
             </div>
+            <div class="groups">
             {f.groups.map((g) => (
               <GroupRow
                 key={g.key}
                 group={g}
                 inv={inv}
-                expanded={Boolean(open[g.key])}
+                selected={selected}
+                expanded={open[g.key] ?? g.spools.some((s) => s.id === selected)}
                 onToggle={() => setOpen((prev) => ({ ...prev, [g.key]: !prev[g.key] }))}
               />
             ))}
+            </div>
           </section>
         ))}
 
@@ -155,6 +161,20 @@ export function Inventory(): JSX.Element {
       </div>
 
       <TabBar active="inventory" />
+    </div>
+  );
+
+  if (!wide) return list;
+  return (
+    <div class="split">
+      {list}
+      <aside class="detailpane" aria-label="Spool">
+        {selected ? (
+          <SpoolDetail key={selected} id={selected} embedded />
+        ) : (
+          <div class="empty">Pick a spool to see its level, where it is and what has been used.</div>
+        )}
+      </aside>
     </div>
   );
 }
@@ -200,11 +220,13 @@ function summary(g: ColourGroup): string {
 function GroupRow({
   group: g,
   inv,
+  selected,
   expanded,
   onToggle,
 }: {
   group: ColourGroup;
   inv: Inv;
+  selected: string | null;
   expanded: boolean;
   onToggle: () => void;
 }): JSX.Element {
@@ -228,7 +250,7 @@ function GroupRow({
   if (g.spools.length === 1) {
     const s = g.spools[0];
     return (
-      <a class="colourrow" href={href(`/spool/${s.id}`)} aria-label={`${g.colorName}, ${g.brand} ${g.material}: ${summary(g)}${g.loaded ? ', in a printer' : ''}`}>
+      <a class="colourrow" data-active={s.id === selected} href={href(`/spool/${s.id}`)} aria-label={`${g.colorName}, ${g.brand} ${g.material}: ${summary(g)}${g.loaded ? ', in a printer' : ''}`}>
         {body}
       </a>
     );
@@ -236,13 +258,13 @@ function GroupRow({
 
   return (
     <>
-      <button type="button" class="colourrow" aria-expanded={expanded} onClick={onToggle} aria-label={`${g.colorName}, ${g.brand} ${g.material}: ${g.spools.length} spools, ${summary(g)}`}>
+      <button type="button" class="colourrow" data-active={g.spools.some((s) => s.id === selected)} aria-expanded={expanded} onClick={onToggle} aria-label={`${g.colorName}, ${g.brand} ${g.material}: ${g.spools.length} spools, ${summary(g)}`}>
         {body}
       </button>
       {expanded && (
         <div class="colourrow__members">
           {g.spools.map((s, i) => (
-            <a key={s.id} class="colourrow" href={href(`/spool/${s.id}`)}>
+            <a key={s.id} class="colourrow" data-active={s.id === selected} href={href(`/spool/${s.id}`)}>
               <span class="grow">
                 <span class="colourrow__name" style={{ fontSize: '13.5px' }}>
                   Spool {i + 1}
