@@ -109,7 +109,6 @@ export type IconName =
   | 'printer'
   | 'loaded'
   | 'spool'
-  | 'refill'
   | 'plus'
   | 'minus'
   | 'chevronLeft'
@@ -147,14 +146,6 @@ const PATHS: Record<IconName, JSX.Element> = {
     <>
       <circle cx="12" cy="12" r="8.5" />
       <circle cx="12" cy="12" r="3" />
-    </>
-  ),
-  refill: (
-    <>
-      <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
-      <path d="M21 3v5h-5" />
-      <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
-      <path d="M3 21v-5h5" />
     </>
   ),
   plus: <path d="M12 5v14M5 12h14" />,
@@ -239,12 +230,11 @@ export function Icon({ name, size = 18 }: { name: IconName; size?: number }): JS
   );
 }
 
-export function TabBar({ active }: { active: 'printers' | 'inventory' | 'refills' | 'add' }): JSX.Element {
+export function TabBar({ active }: { active: 'printers' | 'inventory' | 'add' }): JSX.Element {
   const writable = canEdit(useApp());
   const tabs: Array<{ id: typeof active; to: string; label: string; icon: IconName }> = [
     { id: 'printers', to: '/', label: 'Printers', icon: 'printer' },
     { id: 'inventory', to: '/inventory', label: 'Inventory', icon: 'spool' },
-    { id: 'refills', to: '/refills', label: 'Refills', icon: 'refill' },
     // Without a token there is nothing to add to.
     ...(writable ? [{ id: 'add' as const, to: '/add', label: 'Add', icon: 'plus' as const }] : []),
   ];

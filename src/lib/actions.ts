@@ -1,5 +1,5 @@
 import { mutate } from './store';
-import { totalSlots, type Location, type Printer, type Spool } from './types';
+import { totalSlots, type Inventory, type Location, type Printer, type Spool } from './types';
 import { newId } from './util';
 
 export function addSpool(spool: Omit<Spool, 'id' | 'addedAt'>): string {
@@ -29,34 +29,38 @@ export function updateSpool(id: string, patch: Partial<Spool>, message?: string)
 export function deleteSpool(id: string): void {
   mutate((inv) => {
     const spool = inv.spools.find((s) => s.id === id);
-    // A mounted refill hands its reusable spool back when the filament is gone.
+    // A refill still on its reusable spool hands the spool back. One that ran out
+    // already gave it back then, and a regular spool is only counted when it runs
+    // out, after asking whether it was reusable.
     if (spool?.form === 'refill' && spool.mounted) inv.emptySpools += 1;
-    if (spool?.form === 'spool') inv.emptySpools += 1;
     inv.spools = inv.spools.filter((s) => s.id !== id);
   }, 'Remove spool');
 }
 
+/** Puts a spool somewhere, evicting whatever already sits in the target slot. */
+function place(inv: Inventory, id: string, location: Location): void {
+  if (location.kind !== 'storage') {
+    for (const other of inv.spools) {
+      if (other.id === id) continue;
+      const l = other.location;
+      if (l.kind === 'storage' || l.printer !== location.printer) continue;
+      const clash = location.kind === 'ams' ? l.kind === 'ams' && l.slot === location.slot : l.kind === 'direct';
+      if (clash) other.location = { kind: 'storage' };
+    }
+  }
+  const spool = inv.spools.find((s) => s.id === id);
+  if (!spool) return;
+  // Putting a spool in a printer means you opened it to get it there.
+  if (location.kind !== 'storage' && spool.sealed) {
+    spool.sealed = false;
+    spool.openedAt = spool.openedAt ?? new Date().toISOString();
+  }
+  spool.location = location;
+}
+
 /** Moves a spool, evicting whatever already sits in the target slot. */
 export function setLocation(id: string, location: Location): void {
-  mutate((inv) => {
-    if (location.kind !== 'storage') {
-      for (const other of inv.spools) {
-        if (other.id === id) continue;
-        const l = other.location;
-        if (l.kind === 'storage' || l.printer !== location.printer) continue;
-        const clash = location.kind === 'ams' ? l.kind === 'ams' && l.slot === location.slot : l.kind === 'direct';
-        if (clash) other.location = { kind: 'storage' };
-      }
-    }
-    const spool = inv.spools.find((s) => s.id === id);
-    if (!spool) return;
-    // Putting a spool in a printer means you opened it to get it there.
-    if (location.kind !== 'storage' && spool.sealed) {
-      spool.sealed = false;
-      spool.openedAt = spool.openedAt ?? new Date().toISOString();
-    }
-    spool.location = location;
-  }, 'Move spool');
+  mutate((inv) => place(inv, id, location), 'Move spool');
 }
 
 /** Takes a spool out of a printer or AMS slot and back to storage. */
@@ -67,6 +71,19 @@ export function unloadSpool(id: string): void {
   }, 'Unload spool');
 }
 
+/**
+ * Used up: it comes out of the printer, and a refill's reusable spool goes back
+ * to the pool. It stays in the inventory so Reorder still sees it.
+ */
+function runOut(inv: Inventory, spool: Spool): void {
+  spool.remainingPct = 0;
+  spool.location = { kind: 'storage' };
+  if (spool.form === 'refill' && spool.mounted) {
+    spool.mounted = false;
+    inv.emptySpools += 1;
+  }
+}
+
 /** Ran out: still in the inventory so you know to reorder, but no longer sealed. */
 export function markEmpty(id: string): void {
   mutate((inv) => {
@@ -74,8 +91,15 @@ export function markEmpty(id: string): void {
     if (!spool) return;
     spool.sealed = false;
     spool.openedAt = spool.openedAt ?? new Date().toISOString();
-    spool.remainingPct = 0;
+    runOut(inv, spool);
   }, 'Mark spool empty');
+}
+
+/** A regular spool ran out and its spool can be reused. */
+export function returnEmptySpool(): void {
+  mutate((inv) => {
+    inv.emptySpools += 1;
+  }, 'Return an empty spool');
 }
 
 /**
@@ -94,6 +118,8 @@ export function recordPrint(id: string, grams: number): void {
     }
     const left = (spool.netWeightG * spool.remainingPct) / 100 - grams;
     spool.remainingPct = Math.max(0, (left / spool.netWeightG) * 100);
+    // Stored levels are whole percents, so below half a percent it is gone.
+    if (spool.remainingPct < 0.5) runOut(inv, spool);
   }, `Print used ${Math.round(grams)} g`);
 }
 
@@ -108,7 +134,8 @@ export function setSealed(id: string, sealed: boolean): void {
   }, sealed ? 'Mark spool sealed' : 'Mark spool opened');
 }
 
-export function mountRefill(id: string): void {
+/** Winds a refill onto a free reusable spool, and loads it straight away when given a place. */
+export function mountRefill(id: string, location?: Location): void {
   mutate((inv) => {
     const spool = inv.spools.find((s) => s.id === id);
     if (!spool || spool.mounted || inv.emptySpools <= 0) return;
@@ -119,18 +146,8 @@ export function mountRefill(id: string): void {
       spool.sealed = false;
       spool.openedAt = spool.openedAt ?? new Date().toISOString();
     }
-  }, 'Mount refill on a spool');
-}
-
-export function unmountRefill(id: string): void {
-  mutate((inv) => {
-    const spool = inv.spools.find((s) => s.id === id);
-    if (!spool || !spool.mounted) return;
-    spool.mounted = false;
-    inv.emptySpools += 1;
-    // Filament with no spool under it cannot stay loaded in a printer.
-    spool.location = { kind: 'storage' };
-  }, 'Free up a spool');
+    if (location) place(inv, id, location);
+  }, location ? 'Mount refill and load it' : 'Mount refill on a spool');
 }
 
 export function setEmptySpools(n: number): void {

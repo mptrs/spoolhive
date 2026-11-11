@@ -2,9 +2,9 @@ import type { JSX } from 'preact';
 import { useState } from 'preact/hooks';
 import { canEdit, useApp } from '../lib/store';
 import { back, href } from '../lib/router';
-import { isLoaded, locationText, remainingGrams } from '../lib/types';
+import { isLoaded, locationText, needsSpool, remainingGrams } from '../lib/types';
 import { BackButton, Icon, Note, Swatch } from '../components/ui';
-import { deleteSpool, markEmpty, recordPrint, setSealed, unloadSpool } from '../lib/actions';
+import { deleteSpool, markEmpty, mountRefill, recordPrint, returnEmptySpool, setSealed, unloadSpool } from '../lib/actions';
 import { shortDate } from '../lib/util';
 
 function levelColour(pct: number): string {
@@ -18,6 +18,8 @@ export function SpoolDetail({ id, embedded = false }: { id: string; embedded?: b
   const spool = inv.spools.find((s) => s.id === id);
   const [grams, setGrams] = useState('');
   const [lastPrint, setLastPrint] = useState<number | null>(null);
+  // A regular spool that just ran out: only the user knows whether its spool is reusable.
+  const [askReusable, setAskReusable] = useState(false);
 
   if (!spool) {
     return (
@@ -38,12 +40,16 @@ export function SpoolDetail({ id, embedded = false }: { id: string; embedded?: b
   const pct = spool.remainingPct;
   const used = Number(grams);
   const canSubtract = used > 0 && Number.isFinite(used);
-  const grounded = spool.form === 'refill' && !spool.mounted;
+  const grounded = needsSpool(spool);
+  // A refill always sits on a reusable spool, which goes back to the pool by itself.
+  const asksOnEmpty = spool.form === 'spool' && pct > 0;
 
   const submit = (e: Event): void => {
     e.preventDefault();
     if (!canSubtract) return;
+    const runsOut = spool.netWeightG > 0 && remainingGrams(spool) - used < spool.netWeightG / 200;
     recordPrint(spool.id, used);
+    if (asksOnEmpty && runsOut) setAskReusable(true);
     setLastPrint(used);
     setGrams('');
   };
@@ -140,6 +146,20 @@ export function SpoolDetail({ id, embedded = false }: { id: string; embedded?: b
             )}
           </div>
 
+          {writable && grounded && (
+            <div class="detailrow">
+              <Icon name="spool" />
+              <span class="grow">
+                {inv.emptySpools === 0
+                  ? 'No empty spool free'
+                  : `${inv.emptySpools} empty ${inv.emptySpools === 1 ? 'spool' : 'spools'} free`}
+              </span>
+              <button type="button" class="btn btn--ghost btn--row" disabled={inv.emptySpools === 0} onClick={() => mountRefill(spool.id)}>
+                Mount on spool
+              </button>
+            </div>
+          )}
+
           {writable && (
             <a class="detailrow" href={href(`/recolor/${spool.id}`)}>
               <Icon name="spool" />
@@ -149,24 +169,37 @@ export function SpoolDetail({ id, embedded = false }: { id: string; embedded?: b
           )}
         </div>
 
-        {grounded && (
-          <Note tone="warn" icon="warn">
-            A refill with no spool under it can only sit in storage.{' '}
-            {inv.emptySpools === 0
-              ? 'No empty spools are free.'
-              : `${inv.emptySpools} empty ${inv.emptySpools === 1 ? 'spool is' : 'spools are'} free.`}
-            {writable && (
-              <>
-                {' '}
-                <a href={href('/refills')}>Mount it</a>
-              </>
-            )}
+        {writable && askReusable && (
+          <Note>
+            <span style={{ display: 'block' }}>This spool is empty. Was it on a reusable spool?</span>
+            <span class="row" style={{ gap: '8px', marginTop: '10px' }}>
+              <button
+                type="button"
+                class="btn btn--row"
+                onClick={() => {
+                  returnEmptySpool();
+                  setAskReusable(false);
+                }}
+              >
+                Yes, keep the spool
+              </button>
+              <button type="button" class="btn btn--ghost btn--row" onClick={() => setAskReusable(false)}>
+                No
+              </button>
+            </span>
           </Note>
         )}
 
         {writable && (
           <div class="row" style={{ gap: '9px', marginTop: 'auto' }}>
-            <button type="button" class="btn btn--ghost grow" onClick={() => markEmpty(spool.id)}>
+            <button
+              type="button"
+              class="btn btn--ghost grow"
+              onClick={() => {
+                markEmpty(spool.id);
+                if (asksOnEmpty) setAskReusable(true);
+              }}
+            >
               Mark empty
             </button>
             <button

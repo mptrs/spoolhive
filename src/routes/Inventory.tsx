@@ -1,16 +1,17 @@
 import type { JSX } from 'preact';
 import { useMemo, useState } from 'preact/hooks';
 import { canEdit, useApp } from '../lib/store';
-import { href } from '../lib/router';
+import { href, navigate } from '../lib/router';
 import { colourGroups, families, type ColourGroup } from '../lib/stock';
 import { locationText, type Inventory as Inv, type Spool } from '../lib/types';
 import { Icon, Swatch, TabBar } from '../components/ui';
 import { SpoolDetail } from './SpoolDetail';
-import { useWide } from '../lib/viewport';
+import { useHeaderHeight, useWide } from '../lib/viewport';
 
 export function Inventory({ selected }: { selected: string | null }): JSX.Element {
   const app = useApp();
   const wide = useWide();
+  const header = useHeaderHeight<HTMLElement>();
   const { inv } = app;
   const writable = canEdit(app);
   const [query, setQuery] = useState('');
@@ -35,7 +36,7 @@ export function Inventory({ selected }: { selected: string | null }): JSX.Elemen
 
   const list = (
     <div class="screen screen--tabbed screen--wide">
-      <header class="topbar" style={{ display: 'block', borderBottom: '1px solid var(--line-soft)' }}>
+      <header ref={header} class="topbar" style={{ display: 'block', borderBottom: '1px solid var(--line-soft)' }}>
         <h1 style={{ margin: 0 }}>Inventory</h1>
         <div class="mono" style={{ fontSize: '11.5px', color: 'var(--faint)', marginTop: '3px' }}>
           {inv.spools.length} spools · {sealed} sealed · {inv.spools.length - sealed} open · ≈ {(grams / 1000).toFixed(1)} kg
@@ -76,14 +77,12 @@ export function Inventory({ selected }: { selected: string | null }): JSX.Elemen
                 key={f.name}
                 href={`#fam-${f.name}`}
                 onClick={(e) => {
-                  // The app routes on the hash, so scroll instead of following it.
-                  // Only the list scrolls: scrollIntoView would also shift the
-                  // whole page and push the header off screen.
+                  // The app routes on the hash, so scroll instead of following it,
+                  // and stop just under the sticky header rather than behind it.
                   e.preventDefault();
                   const section = document.getElementById(`fam-${f.name}`);
-                  const list = section?.closest('.screen__body');
-                  if (!section || !list) return;
-                  list.scrollTop += section.getBoundingClientRect().top - list.getBoundingClientRect().top;
+                  if (!section || !header.current) return;
+                  window.scrollBy(0, section.getBoundingClientRect().top - header.current.getBoundingClientRect().bottom);
                 }}
               >
                 {f.name}
@@ -179,6 +178,16 @@ export function Inventory({ selected }: { selected: string | null }): JSX.Elemen
   );
 }
 
+/**
+ * With a spool already open beside the list, picking another one swaps it in
+ * place, so Back returns to where you came from instead of through every spool.
+ */
+function swapSpool(e: MouseEvent, selected: string | null, id: string): void {
+  if (selected === null) return;
+  e.preventDefault();
+  if (id !== selected) navigate(`/spool/${id}`, { replace: true });
+}
+
 function levelColour(pct: number): string {
   return pct <= 15 ? 'var(--red)' : pct <= 30 ? 'var(--accent)' : 'var(--green)';
 }
@@ -250,7 +259,7 @@ function GroupRow({
   if (g.spools.length === 1) {
     const s = g.spools[0];
     return (
-      <a class="colourrow" data-active={s.id === selected} href={href(`/spool/${s.id}`)} aria-label={`${g.colorName}, ${g.brand} ${g.material}: ${summary(g)}${g.loaded ? ', in a printer' : ''}`}>
+      <a class="colourrow" data-active={s.id === selected} href={href(`/spool/${s.id}`)} onClick={(e) => swapSpool(e, selected, s.id)} aria-label={`${g.colorName}, ${g.brand} ${g.material}: ${summary(g)}${g.loaded ? ', in a printer' : ''}`}>
         {body}
       </a>
     );
@@ -264,7 +273,7 @@ function GroupRow({
       {expanded && (
         <div class="colourrow__members">
           {g.spools.map((s, i) => (
-            <a key={s.id} class="colourrow" data-active={s.id === selected} href={href(`/spool/${s.id}`)}>
+            <a key={s.id} class="colourrow" data-active={s.id === selected} href={href(`/spool/${s.id}`)} onClick={(e) => swapSpool(e, selected, s.id)}>
               <span class="grow">
                 <span class="colourrow__name" style={{ fontSize: '13.5px' }}>
                   Spool {i + 1}

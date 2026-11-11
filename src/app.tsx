@@ -1,5 +1,5 @@
 import type { JSX } from 'preact';
-import { useEffect } from 'preact/hooks';
+import { useEffect, useLayoutEffect, useRef } from 'preact/hooks';
 import { match, navigate, useRoute } from './lib/router';
 import { canEdit, useApp } from './lib/store';
 import { Printers } from './routes/Printers';
@@ -7,7 +7,6 @@ import { Inventory } from './routes/Inventory';
 import { Reorder } from './routes/Reorder';
 import { SpoolDetail } from './routes/SpoolDetail';
 import { AddSpool } from './routes/AddSpool';
-import { Refills } from './routes/Refills';
 import { PrinterList } from './routes/PrinterList';
 import { PrinterEdit } from './routes/PrinterEdit';
 import { LoadSlot } from './routes/LoadSlot';
@@ -43,6 +42,16 @@ function Routes({ path }: { path: string }): JSX.Element {
   useEffect(() => {
     if (blocked) navigate('/', { replace: true });
   }, [blocked]);
+
+  // The page scrolls, so a new screen would open at the old one's scroll position.
+  // Start each screen at the top, except when picking a spool beside the inventory
+  // list on a wide screen: that is the same list, and it should stay where it was.
+  const previous = useRef(path);
+  useLayoutEffect(() => {
+    const onList = (p: string): boolean => p === '/inventory' || p.startsWith('/spool/');
+    if (!(wide && onList(previous.current) && onList(path))) window.scrollTo(0, 0);
+    previous.current = path;
+  }, [path]);
   if (blocked) return <div class="screen" />;
 
   // Only block on the very first load, when there is nothing cached to show.
@@ -59,7 +68,7 @@ function Routes({ path }: { path: string }): JSX.Element {
   const spool = match('/spool/:id', path);
   // With room to spare, a spool opens beside the list instead of replacing it.
   if (spool && wide) return <Inventory selected={spool.id} />;
-  if (spool) return <SpoolDetail id={spool.id} />;
+  if (spool) return <SpoolDetail key={spool.id} id={spool.id} />;
 
   const printer = match('/printer/:id', path);
   if (printer) return <PrinterEdit id={printer.id} />;
@@ -77,8 +86,6 @@ function Routes({ path }: { path: string }): JSX.Element {
       return <Reorder />;
     case '/add':
       return <AddSpool />;
-    case '/refills':
-      return <Refills />;
     case '/printers':
       return <PrinterList />;
     case '/connect':

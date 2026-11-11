@@ -4,12 +4,11 @@ import { canEdit, useApp } from '../lib/store';
 import { relativeTime } from '../lib/util';
 import { Icon, type IconName } from './ui';
 
-type Section = 'printers' | 'inventory' | 'refills' | 'add' | 'manage' | 'sync' | null;
+type Section = 'printers' | 'inventory' | 'add' | 'manage' | 'sync' | null;
 
 function sectionOf(path: string): Section {
   if (path === '/') return 'printers';
   if (path === '/inventory' || path === '/reorder' || path.startsWith('/spool/') || path.startsWith('/recolor/')) return 'inventory';
-  if (path === '/refills') return 'refills';
   if (path === '/add') return 'add';
   if (path === '/printers' || path.startsWith('/printer/') || path.startsWith('/load/')) return 'manage';
   if (path === '/connect') return 'sync';
@@ -24,18 +23,16 @@ function sectionOf(path: string): Section {
 export function Sidebar({ path }: { path: string }): JSX.Element {
   const app = useApp();
   const writable = canEdit(app);
-  const { inv, online, syncing, pending, lastSync } = app;
+  const { online, syncing, pending, lastSync } = app;
   const active = sectionOf(path);
-  const refillsWaiting = inv.spools.filter((s) => s.form === 'refill' && !s.mounted).length;
 
   const syncLabel = !online ? 'Offline' : syncing ? 'Saving' : pending > 0 ? `${pending} to push` : 'Synced';
   const syncTone = !online ? 'var(--faint)' : pending > 0 || syncing ? 'var(--accent)' : 'var(--green)';
 
-  const item = (id: Section, to: string, label: string, icon: IconName, badge?: number): JSX.Element => (
+  const item = (id: Section, to: string, label: string, icon: IconName): JSX.Element => (
     <a class="sidebar__item" href={href(to)} data-active={active === id} aria-label={label} title={label}>
       <Icon name={icon} size={20} />
       <span class="sidebar__label">{label}</span>
-      {badge ? <span class="sidebar__badge">{badge}</span> : null}
     </a>
   );
 
@@ -51,7 +48,6 @@ export function Sidebar({ path }: { path: string }): JSX.Element {
 
       {item('printers', '/', 'Printers', 'printer')}
       {item('inventory', '/inventory', 'Inventory', 'spool')}
-      {item('refills', '/refills', 'Refills', 'refill', refillsWaiting)}
 
       {writable && (
         <a class="sidebar__add" href={href('/add')} aria-label="Add spool" title="Add spool">

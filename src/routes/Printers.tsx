@@ -1,7 +1,7 @@
 import type { JSX } from 'preact';
 import { canEdit, useApp } from '../lib/store';
 import { href } from '../lib/router';
-import { totalSlots, type Printer, type Spool } from '../lib/types';
+import { needsSpool, totalSlots, type Printer, type Spool } from '../lib/types';
 import { Bar, Icon, Note, Swatch, TabBar, pctColor } from '../components/ui';
 import { unloadSpool } from '../lib/actions';
 import { relativeTime } from '../lib/util';
@@ -18,7 +18,7 @@ export function Printers(): JSX.Element {
   // Low means no sealed spare of that colour either - a nearly empty roll with a fresh one on the shelf is just a swap.
   const low = colourGroups(inv.spools).filter((g) => g.low && g.loaded);
   const stored = inv.spools.length - loaded.length;
-  const refillsWaiting = inv.spools.filter((s) => s.form === 'refill' && !s.mounted).length;
+  const refillsWaiting = inv.spools.filter(needsSpool).length;
 
   const syncLabel = !online ? 'Offline' : syncing ? 'Saving' : pending > 0 ? `${pending} to push` : 'Synced';
   const syncTone = !online ? 'var(--faint)' : pending > 0 || syncing ? 'var(--accent)' : 'var(--green)';
