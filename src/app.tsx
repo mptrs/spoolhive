@@ -4,6 +4,7 @@ import { match, navigate, useRoute } from './lib/router';
 import { canEdit, useApp } from './lib/store';
 import { Printers } from './routes/Printers';
 import { Inventory } from './routes/Inventory';
+import { Reorder } from './routes/Reorder';
 import { SpoolDetail } from './routes/SpoolDetail';
 import { AddSpool } from './routes/AddSpool';
 import { Refills } from './routes/Refills';
@@ -56,6 +57,8 @@ export function App(): JSX.Element {
   switch (path) {
     case '/inventory':
       return <Inventory />;
+    case '/reorder':
+      return <Reorder />;
     case '/add':
       return <AddSpool />;
     case '/refills':

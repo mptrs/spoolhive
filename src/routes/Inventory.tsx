@@ -2,85 +2,93 @@ import type { JSX } from 'preact';
 import { useMemo, useState } from 'preact/hooks';
 import { canEdit, useApp } from '../lib/store';
 import { href } from '../lib/router';
-import { locationText, needsSpool, remainingGrams, type Inventory as Inv, type Spool } from '../lib/types';
-import { Bar, Icon, Swatch, TabBar, pctColor } from '../components/ui';
-
-type FilterId = 'all' | 'pla' | 'petg' | 'other' | 'sealed' | 'open' | 'low' | 'nospool';
-
-const FILTERS: Array<{ id: FilterId; label: string; test: (s: Spool) => boolean }> = [
-  { id: 'all', label: 'All', test: () => true },
-  { id: 'pla', label: 'PLA', test: (s) => /pla/i.test(s.material) },
-  { id: 'petg', label: 'PETG', test: (s) => /petg/i.test(s.material) },
-  { id: 'other', label: 'Other', test: (s) => !/pla|petg/i.test(s.material) },
-  { id: 'sealed', label: 'Sealed', test: (s) => s.sealed },
-  { id: 'open', label: 'Open', test: (s) => !s.sealed },
-  { id: 'low', label: 'Low', test: (s) => !s.sealed && s.remainingPct <= 15 },
-  { id: 'nospool', label: 'Needs spool', test: needsSpool },
-];
+import { colourGroups, families, type ColourGroup } from '../lib/stock';
+import { locationText, type Inventory as Inv, type Spool } from '../lib/types';
+import { Icon, Swatch, TabBar } from '../components/ui';
 
 export function Inventory(): JSX.Element {
   const app = useApp();
   const { inv } = app;
   const writable = canEdit(app);
   const [query, setQuery] = useState('');
-  const [filter, setFilter] = useState<FilterId>('all');
+  const [open, setOpen] = useState<Record<string, boolean>>({});
 
-  const counts = useMemo(() => {
-    const out = {} as Record<FilterId, number>;
-    for (const f of FILTERS) out[f.id] = inv.spools.filter(f.test).length;
-    return out;
-  }, [inv.spools]);
+  const all = useMemo(() => families(inv.spools), [inv.spools]);
+  const lowCount = useMemo(() => colourGroups(inv.spools).filter((g) => g.low).length, [inv.spools]);
 
   const visible = useMemo(() => {
-    const test = FILTERS.find((f) => f.id === filter)?.test ?? (() => true);
     const q = query.trim().toLowerCase();
-    return inv.spools.filter((s) => {
-      if (!test(s)) return false;
-      if (!q) return true;
-      return `${s.colorName} ${s.brand} ${s.material} ${s.notes ?? ''}`.toLowerCase().includes(q);
-    });
-  }, [inv.spools, filter, query]);
+    if (!q) return all;
+    return all
+      .map((f) => ({
+        ...f,
+        groups: f.groups.filter((g) => `${g.colorName} ${g.brand} ${g.material}`.toLowerCase().includes(q)),
+      }))
+      .filter((f) => f.groups.length > 0);
+  }, [all, query]);
 
-  const loaded = visible.filter((s) => s.location.kind !== 'storage');
-  const stored = visible.filter((s) => s.location.kind === 'storage');
-
-  const [open, setOpen] = useState<Record<string, boolean>>({});
-  const toggle = (key: string): void => setOpen((prev) => ({ ...prev, [key]: !prev[key] }));
+  const sealed = inv.spools.filter((s) => s.sealed).length;
+  const grams = inv.spools.reduce((sum, s) => sum + (s.netWeightG * s.remainingPct) / 100, 0);
 
   return (
     <div class="screen screen--tabbed">
-      <header class="topbar" style={{ display: 'block' }}>
-        <div class="row" style={{ alignItems: 'baseline' }}>
-          <h1 class="grow">Inventory</h1>
-          <span class="mono" style={{ fontSize: '12px', color: 'var(--faint)' }}>
-            {inv.spools.length} spools
-          </span>
+      <header class="topbar" style={{ display: 'block', borderBottom: '1px solid var(--line-soft)' }}>
+        <h1 style={{ margin: 0 }}>Inventory</h1>
+        <div class="mono" style={{ fontSize: '11.5px', color: 'var(--faint)', marginTop: '3px' }}>
+          {inv.spools.length} spools · {sealed} sealed · {inv.spools.length - sealed} open · ≈ {(grams / 1000).toFixed(1)} kg
         </div>
 
-        <div class="row" style={{ gap: '9px', marginTop: '13px' }}>
+        {lowCount > 0 && (
+          <a class="reorderbar" href={href('/reorder')} style={{ marginTop: '12px' }}>
+            <Icon name="warn" size={16} />
+            <span class="grow">
+              <b style={{ fontWeight: 600 }}>
+                {lowCount} {lowCount === 1 ? 'colour' : 'colours'}
+              </b>{' '}
+              running low
+            </span>
+            <span>Reorder ›</span>
+          </a>
+        )}
+
+        <div class="row" style={{ gap: '9px', marginTop: '12px', background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '11px', padding: '0 12px', height: '42px' }}>
+          <Icon name="search" size={16} />
           <label class="sr-only" for="q">
             Search filament
           </label>
-          <div class="row" style={{ flexGrow: 1, gap: '9px', background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '11px', padding: '0 12px', height: '42px' }}>
-            <Icon name="search" size={16} />
-            <input
-              id="q"
-              type="search"
-              value={query}
-              onInput={(e) => setQuery((e.target as HTMLInputElement).value)}
-              placeholder="Search colour, brand, material"
-              style={{ flexGrow: 1, background: 'transparent', border: 0, outline: 'none', minWidth: 0, fontSize: '13.5px' }}
-            />
-          </div>
+          <input
+            id="q"
+            type="search"
+            value={query}
+            onInput={(e) => setQuery((e.target as HTMLInputElement).value)}
+            placeholder="Search colour, brand, material"
+            style={{ flexGrow: 1, background: 'transparent', border: 0, outline: 'none', minWidth: 0, fontSize: '14px' }}
+          />
         </div>
 
-        <div class="row" style={{ gap: '7px', marginTop: '11px', overflowX: 'auto', paddingBottom: '2px' }}>
-          {FILTERS.filter((f) => f.id === 'all' || counts[f.id] > 0).map((f) => (
-            <button key={f.id} type="button" class="chip" data-on={filter === f.id} onClick={() => setFilter(f.id)}>
-              {f.label} {counts[f.id]}
-            </button>
-          ))}
-        </div>
+        {visible.length > 1 && (
+          <nav class="jump" aria-label="Jump to material" style={{ marginTop: '11px' }}>
+            {visible.map((f) => (
+              <a
+                key={f.name}
+                href={`#fam-${f.name}`}
+                onClick={(e) => {
+                  // The app routes on the hash, so scroll instead of following it.
+                  // Only the list scrolls: scrollIntoView would also shift the
+                  // whole page and push the header off screen.
+                  e.preventDefault();
+                  const section = document.getElementById(`fam-${f.name}`);
+                  const list = section?.closest('.screen__body');
+                  if (!section || !list) return;
+                  list.scrollTop += section.getBoundingClientRect().top - list.getBoundingClientRect().top;
+                }}
+              >
+                {f.name}
+                <span>{f.spools}</span>
+              </a>
+            ))}
+          </nav>
+        )}
       </header>
 
       <div class="screen__body">
@@ -102,11 +110,48 @@ export function Inventory(): JSX.Element {
           </div>
         )}
 
-        {loaded.length > 0 && (
-          <Section title="Loaded in a printer" spools={loaded} inv={inv} open={open} toggle={toggle} />
-        )}
+        {visible.map((f) => (
+          // The id sits on the section, not the sticky heading: a stuck heading
+          // reports where it is pinned, so scrolling to it would go nowhere.
+          <section key={f.name} id={`fam-${f.name}`}>
+            <div class="famhead">
+              <h2>{f.name}</h2>
+              <div class="famhead__sub">
+                {f.sealed} sealed · {f.spools - f.sealed} open
+              </div>
+            </div>
+            {f.groups.map((g) => (
+              <GroupRow
+                key={g.key}
+                group={g}
+                inv={inv}
+                expanded={Boolean(open[g.key])}
+                onToggle={() => setOpen((prev) => ({ ...prev, [g.key]: !prev[g.key] }))}
+              />
+            ))}
+          </section>
+        ))}
 
-        {stored.length > 0 && <Section title="Storage" spools={stored} inv={inv} open={open} toggle={toggle} />}
+        {visible.length > 0 && (
+          <div class="legend">
+            <span>
+              <span class="reel reel--sealed" style={{ height: '16px' }} />
+              sealed
+            </span>
+            <span>
+              <span class="reel" style={{ height: '16px' }}>
+                <span style={{ height: '60%', background: 'var(--green)' }} />
+              </span>
+              open
+            </span>
+            <span>
+              <span style={{ color: 'var(--accent)', display: 'flex' }}>
+                <Icon name="loaded" size={14} />
+              </span>
+              in a printer
+            </span>
+          </div>
+        )}
       </div>
 
       <TabBar active="inventory" />
@@ -114,148 +159,104 @@ export function Inventory(): JSX.Element {
   );
 }
 
-/** Same brand, material and colour is the same filament, however many reels of it you have. */
-function groupKey(spool: Spool): string {
-  return `${spool.brand}|${spool.material}|${spool.colorName}|${spool.hex}`.toLowerCase();
+function levelColour(pct: number): string {
+  return pct <= 15 ? 'var(--red)' : pct <= 30 ? 'var(--accent)' : 'var(--green)';
 }
 
-function Section({
-  title,
-  spools,
-  inv,
-  open,
-  toggle,
-}: {
-  title: string;
-  spools: Spool[];
-  inv: Inv;
-  open: Record<string, boolean>;
-  toggle: (key: string) => void;
-}): JSX.Element {
-  const groups = new Map<string, Spool[]>();
-  for (const spool of spools) {
-    const key = groupKey(spool);
-    groups.set(key, [...(groups.get(key) ?? []), spool]);
-  }
+const MAX_BARS = 5;
 
+/** Emptiest on the left, filling up to the right; a sealed spool is full, so it comes last. */
+function byLevel(a: Spool, b: Spool): number {
+  return (a.sealed ? 101 : a.remainingPct) - (b.sealed ? 101 : b.remainingPct);
+}
+
+function Reels({ spools }: { spools: Spool[] }): JSX.Element {
+  const shown = [...spools].sort(byLevel).slice(0, MAX_BARS);
   return (
-    <>
-      <div class="sectionhead">
-        <span class="label grow">
-          {title} · {spools.length}
-        </span>
-      </div>
-      {[...groups.entries()].map(([key, members]) =>
-        members.length === 1 ? (
-          <SpoolRow key={key} spool={members[0]} inv={inv} />
+    <span class="reels" aria-hidden="true">
+      {shown.map((s) =>
+        s.sealed ? (
+          <span key={s.id} class="reel reel--sealed" />
         ) : (
-          <GroupRow
-            key={key}
-            members={members}
-            inv={inv}
-            expanded={Boolean(open[key])}
-            onToggle={() => toggle(key)}
-          />
+          <span key={s.id} class="reel">
+            <span style={{ height: `${Math.max(s.remainingPct, 4)}%`, background: levelColour(s.remainingPct) }} />
+          </span>
         ),
       )}
-    </>
+      {spools.length > MAX_BARS && <span class="reels__more">+{spools.length - MAX_BARS}</span>}
+    </span>
   );
 }
 
+function summary(g: ColourGroup): string {
+  const open = g.spools.length - g.sealed;
+  const parts = [];
+  if (g.sealed) parts.push(`${g.sealed} sealed`);
+  if (open === 1) parts.push(`1 open at ${Math.round(g.openPct)}%`);
+  else if (open > 1) parts.push(`${open} open`);
+  return parts.join(', ');
+}
+
 function GroupRow({
-  members,
+  group: g,
   inv,
   expanded,
   onToggle,
 }: {
-  members: Spool[];
+  group: ColourGroup;
   inv: Inv;
   expanded: boolean;
   onToggle: () => void;
 }): JSX.Element {
-  const first = members[0];
-  const grams = members.reduce((total, s) => total + remainingGrams(s), 0);
-  const sealed = members.filter((s) => s.sealed).length;
-  const amount = grams >= 1000 ? `${(grams / 1000).toFixed(1)} kg` : `${grams} g`;
+  const body = (
+    <>
+      <Swatch hex={g.hex} hexes={g.hexes} size={28} radius={14} />
+      <span class="grow">
+        <span class="colourrow__name truncate" data-low={g.low}>
+          {g.colorName}
+          {g.low && <span class="sr-only"> (running low)</span>}
+        </span>
+        <span class="colourrow__sub truncate">
+          {g.brand} · {g.material}
+        </span>
+      </span>
+      <span class="colourrow__printer">{g.loaded && <Icon name="loaded" size={18} />}</span>
+      <Reels spools={g.spools} />
+    </>
+  );
+
+  if (g.spools.length === 1) {
+    const s = g.spools[0];
+    return (
+      <a class="colourrow" href={href(`/spool/${s.id}`)} aria-label={`${g.colorName}, ${g.brand} ${g.material}: ${summary(g)}${g.loaded ? ', in a printer' : ''}`}>
+        {body}
+      </a>
+    );
+  }
 
   return (
     <>
-      <button type="button" class="listrow" aria-expanded={expanded} onClick={onToggle}>
-        <Swatch hex={first.hex} hexes={first.hexes} />
-        <span class="grow">
-          <span class="listrow__name truncate" style={{ display: 'block' }}>
-            {first.colorName}
-          </span>
-          <span class="listrow__sub truncate" style={{ display: 'block' }}>
-            {first.brand} · {first.material}
-            {sealed > 0 && ` · ${sealed} sealed`}
-          </span>
-        </span>
-        <span style={{ flexShrink: 0, textAlign: 'right' }}>
-          <span class="pill" style={{ display: 'block', fontWeight: 600, color: 'var(--text)' }}>
-            {members.length} reels
-          </span>
-          <span class="mono" style={{ display: 'block', fontSize: '11.5px', color: 'var(--faint)', marginTop: '5px' }}>
-            ≈ {amount}
-          </span>
-        </span>
-        <span style={{ flexShrink: 0, color: 'var(--ghost)', transform: expanded ? 'rotate(90deg)' : 'none' }}>
-          <Icon name="chevronRight" size={16} />
-        </span>
+      <button type="button" class="colourrow" aria-expanded={expanded} onClick={onToggle} aria-label={`${g.colorName}, ${g.brand} ${g.material}: ${g.spools.length} spools, ${summary(g)}`}>
+        {body}
       </button>
-
       {expanded && (
-        <div style={{ paddingLeft: '24px', borderLeft: '1px solid var(--line-soft)', marginLeft: '18px' }}>
-          {members.map((spool) => (
-            <SpoolRow key={spool.id} spool={spool} inv={inv} />
+        <div class="colourrow__members">
+          {g.spools.map((s, i) => (
+            <a key={s.id} class="colourrow" href={href(`/spool/${s.id}`)}>
+              <span class="grow">
+                <span class="colourrow__name" style={{ fontSize: '13.5px' }}>
+                  Spool {i + 1}
+                </span>
+                <span class="colourrow__sub">{s.location.kind === 'storage' ? (s.sealed ? 'Sealed' : 'Storage') : locationText(inv, s.location)}</span>
+              </span>
+              <span class="colourrow__printer">{s.location.kind !== 'storage' && <Icon name="loaded" size={18} />}</span>
+              <span class="mono" style={{ fontSize: '12px', color: s.sealed ? 'var(--green-text)' : 'var(--text-2)', width: '50px', textAlign: 'right' }}>
+                {s.sealed ? 'full' : `${s.remainingPct}%`}
+              </span>
+            </a>
           ))}
         </div>
       )}
     </>
-  );
-}
-
-function SpoolRow({ spool, inv }: { spool: Spool; inv: Inv }): JSX.Element {
-  const detail = [spool.brand, spool.material, spool.form === 'refill' ? (spool.mounted ? 'refill on spool' : 'refill') : `${spool.netWeightG} g`]
-    .filter(Boolean)
-    .join(' · ');
-
-  return (
-    <a class="listrow" href={href(`/spool/${spool.id}`)}>
-      <Swatch hex={spool.hex} hexes={spool.hexes} />
-      <span class="grow">
-        <span class="listrow__name truncate" style={{ display: 'block' }}>
-          {spool.colorName}
-        </span>
-        <span class="listrow__sub truncate" style={{ display: 'block' }}>
-          {detail}
-        </span>
-      </span>
-      <span style={{ flexShrink: 0, textAlign: 'right' }}>
-        {needsSpool(spool) ? (
-          <span class="pill" style={{ background: 'rgba(232,163,61,0.13)', color: 'var(--accent)', fontWeight: 600 }}>
-            Needs spool
-          </span>
-        ) : spool.sealed ? (
-          <span class="pill" style={{ color: 'var(--green-text)', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-            <Icon name="lock" size={11} /> Sealed
-          </span>
-        ) : (
-          <>
-            <span class="pill" style={{ display: 'block' }}>
-              {locationText(inv, spool.location)}
-            </span>
-            <span class="row" style={{ gap: '7px', marginTop: '5px', justifyContent: 'flex-end' }}>
-              <span style={{ width: '48px' }}>
-                <Bar pct={spool.remainingPct} />
-              </span>
-              <span class="mono" style={{ fontSize: '11.5px', color: pctColor(spool.remainingPct) }}>
-                {spool.remainingPct}%
-              </span>
-            </span>
-          </>
-        )}
-      </span>
-    </a>
   );
 }

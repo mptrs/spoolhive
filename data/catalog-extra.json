@@ -12,5 +12,26 @@
   "color": "Clear",
   "hex": "#DDE3E6",
   "source": "manual"
+ },
+ {
+  "brand": "Elegoo",
+  "material": "PLA Basic",
+  "color": "Neon Green",
+  "hex": "#02E601",
+  "source": "manual"
+ },
+ {
+  "brand": "Elegoo",
+  "material": "PLA Metal",
+  "color": "Bronze Filled",
+  "hex": "#895837",
+  "source": "manual"
+ },
+ {
+  "brand": "Elegoo",
+  "material": "PLA Wood",
+  "color": "Wood Filled",
+  "hex": "#9D8058",
+  "source": "manual"
  }
 ]

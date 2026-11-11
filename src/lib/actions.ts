@@ -78,6 +78,25 @@ export function markEmpty(id: string): void {
   }, 'Mark spool empty');
 }
 
+/**
+ * A print used `grams` of this spool - the weight Bambu Studio shows for it.
+ * Printing is the only thing that uses filament up, so it is the only way the
+ * level goes down. Printing from a sealed spool means it has been opened.
+ */
+export function recordPrint(id: string, grams: number): void {
+  if (!(grams > 0)) return;
+  mutate((inv) => {
+    const spool = inv.spools.find((s) => s.id === id);
+    if (!spool || spool.netWeightG <= 0) return;
+    if (spool.sealed) {
+      spool.sealed = false;
+      spool.openedAt = spool.openedAt ?? new Date().toISOString();
+    }
+    const left = (spool.netWeightG * spool.remainingPct) / 100 - grams;
+    spool.remainingPct = Math.max(0, (left / spool.netWeightG) * 100);
+  }, `Print used ${Math.round(grams)} g`);
+}
+
 /** Opening a spool is what lets it have a level, a dry state and a location. */
 export function setSealed(id: string, sealed: boolean): void {
   mutate((inv) => {
@@ -95,6 +114,11 @@ export function mountRefill(id: string): void {
     if (!spool || spool.mounted || inv.emptySpools <= 0) return;
     spool.mounted = true;
     inv.emptySpools -= 1;
+    // Winding a refill onto a spool means the bag is open.
+    if (spool.sealed) {
+      spool.sealed = false;
+      spool.openedAt = spool.openedAt ?? new Date().toISOString();
+    }
   }, 'Mount refill on a spool');
 }
 
