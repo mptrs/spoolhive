@@ -417,13 +417,14 @@
       "mounted": true,
       "netWeightG": 1000,
       "remainingPct": 100,
-      "sealed": true,
+      "sealed": false,
       "dryState": "dry",
       "location": {
         "kind": "storage"
       },
       "id": "7734ff9b-4fed-43d9-a0a4-85e4271a5928",
-      "addedAt": "2026-09-28T21:15:05.085Z"
+      "addedAt": "2026-09-28T21:15:05.085Z",
+      "openedAt": "2026-11-11T11:04:58.083Z"
     },
     {
       "brand": "Bambu Lab",
@@ -882,5 +883,5 @@
     }
   ],
   "emptySpools": 0,
-  "updatedAt": "2026-11-11T10:38:55.241Z"
+  "updatedAt": "2026-11-11T11:04:58.083Z"
 }
