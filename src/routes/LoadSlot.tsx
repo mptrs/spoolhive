@@ -3,7 +3,7 @@ import { useApp } from '../lib/store';
 import { back, href } from '../lib/router';
 import { locationText, needsSpool, totalSlots, type Location, type Spool } from '../lib/types';
 import { Bar, BackButton, Icon, Note, Swatch, pctColor } from '../components/ui';
-import { setLocation } from '../lib/actions';
+import { mountRefill, setLocation } from '../lib/actions';
 
 export function LoadSlot({ printerId, slot }: { printerId: string; slot: number }): JSX.Element {
   const { inv } = useApp();
@@ -29,6 +29,11 @@ export function LoadSlot({ printerId, slot }: { printerId: string; slot: number 
 
   const load = (spool: Spool): void => {
     setLocation(spool.id, target);
+    back('/');
+  };
+
+  const mountAndLoad = (spool: Spool): void => {
+    mountRefill(spool.id, target);
     back('/');
   };
 
@@ -130,20 +135,27 @@ export function LoadSlot({ printerId, slot }: { printerId: string; slot: number 
                   <span class="label grow">Needs a spool first · {stuck.length}</span>
                 </div>
                 {stuck.map((s) => (
-                  <a key={s.id} class="listrow" href={href('/refills')} style={{ opacity: 0.55 }}>
+                  <button
+                    key={s.id}
+                    type="button"
+                    class="listrow"
+                    disabled={inv.emptySpools === 0}
+                    onClick={() => mountAndLoad(s)}
+                    style={inv.emptySpools === 0 ? { opacity: 0.55 } : undefined}
+                  >
                     <Swatch hex={s.hex} hexes={s.hexes} />
                     <span class="grow">
                       <span class="listrow__name truncate" style={{ display: 'block' }}>
                         {s.colorName}
                       </span>
                       <span class="listrow__sub truncate" style={{ display: 'block' }}>
-                        {s.brand} · {s.material} · refill
+                        {s.brand} · {s.material}
                       </span>
                     </span>
-                    <span class="pill" style={{ flexShrink: 0, color: 'var(--accent)' }}>
-                      Mount it
+                    <span class="pill" style={{ flexShrink: 0, color: inv.emptySpools === 0 ? undefined : 'var(--accent)' }}>
+                      {inv.emptySpools === 0 ? 'No spool free' : 'Mount & load'}
                     </span>
-                  </a>
+                  </button>
                 ))}
               </>
             )}

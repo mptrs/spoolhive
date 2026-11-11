@@ -4,11 +4,13 @@ import { useApp } from '../lib/store';
 import { href } from '../lib/router';
 import { colourGroups, family, LOW_PCT, TIGHT_PCT, type ColourGroup } from '../lib/stock';
 import { BackButton, Swatch } from '../components/ui';
+import { useHeaderHeight } from '../lib/viewport';
 
 /** Colours about to run out entirely, grouped by material, emptiest first. */
 export function Reorder(): JSX.Element {
   const { inv } = useApp();
   const [copied, setCopied] = useState(false);
+  const header = useHeaderHeight<HTMLElement>();
 
   const groups = useMemo(() => {
     const due = colourGroups(inv.spools).filter((g) => g.low || g.tight);
@@ -37,7 +39,7 @@ export function Reorder(): JSX.Element {
 
   return (
     <div class="screen">
-      <header class="topbar" style={{ display: 'block', borderBottom: '1px solid var(--line-soft)' }}>
+      <header ref={header} class="topbar" style={{ display: 'block', borderBottom: '1px solid var(--line-soft)' }}>
         <div class="row">
           <BackButton to="/inventory" label="Back to inventory" />
           <h1 style={{ margin: 0 }}>Reorder</h1>
@@ -97,7 +99,7 @@ export function Reorder(): JSX.Element {
       </div>
 
       {groups.length > 0 && (
-        <div style={{ flexShrink: 0, padding: '12px 20px calc(16px + env(safe-area-inset-bottom))', borderTop: '1px solid var(--line-soft)' }}>
+        <div class="screen__foot">
           <button type="button" class="btn btn--block" onClick={() => void copy()}>
             {copied ? 'Copied' : 'Copy list'}
           </button>

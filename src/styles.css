@@ -52,14 +52,16 @@ a.card, a.slot, a.listrow, a.rowlink { color: var(--text); }
 
 /* ---------- shell ---------- */
 
-/* Content is centred by padding rather than a max-width, so the scrollbar stays at the window edge.
+/* The page itself scrolls; there are no scroll areas inside it. The header sticks
+   to the top and the tab bar to the bottom, so they stay put while the content moves.
+   Content is centred by padding rather than a max-width, so it lines up with the header.
    --content is the widest the content gets; forms stay narrow, overview screens opt in to wide. */
 .screen {
   --content: 640px;
   --gx: max(20px, calc((100% - var(--content)) / 2));
   display: flex;
   flex-direction: column;
-  height: 100dvh;
+  min-height: 100dvh;
 }
 
 .screen--wide { --content: 1200px; }
@@ -68,13 +70,26 @@ a.card, a.slot, a.listrow, a.rowlink { color: var(--text); }
   flex-grow: 1;
   min-height: 0;
   padding: 0 var(--gx) calc(20px + env(safe-area-inset-bottom));
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+}
+
+/* A bar of actions that stays at the bottom of the screen. */
+.screen__foot {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  flex-shrink: 0;
+  background: var(--bg);
+  border-top: 1px solid var(--line-soft);
+  padding: 12px var(--gx) calc(16px + env(safe-area-inset-bottom));
 }
 
 .screen--tabbed .screen__body { padding-bottom: 20px; }
 
 .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--bg);
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -107,6 +122,9 @@ a.card, a.slot, a.listrow, a.rowlink { color: var(--text); }
 }
 
 .tabbar {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
   flex-shrink: 0;
   display: flex;
   background: #16181c;
@@ -293,8 +311,9 @@ textarea.field { resize: vertical; min-height: 66px; }
 
 /* ---------- inventory by material ---------- */
 
-/* Sticks to the top of the scrolling list, so you always know which material you are in. */
-.famhead { position: sticky; top: 0; z-index: 1; background: var(--bg); padding: 16px 0 8px; border-bottom: 1px solid var(--line); scroll-margin-top: 0; }
+/* Sticks just under the header, so you always know which material you are in.
+   --header-h is the header's height, kept up to date by useHeaderHeight. */
+.famhead { position: sticky; top: var(--header-h, 0px); z-index: 1; background: var(--bg); padding: 16px 0 8px; border-bottom: 1px solid var(--line); scroll-margin-top: 0; }
 .famhead h2 { margin: 0; font-family: var(--display); font-size: 20px; font-weight: 600; line-height: 1.1; }
 .famhead__sub { font-family: var(--mono); font-size: 11.5px; color: var(--faint); margin-top: 3px; }
 
@@ -395,7 +414,6 @@ textarea.field { resize: vertical; min-height: 66px; }
   .sidebar__item[data-active='true'],
   .sidebar__status[data-active='true'] { background: var(--surface-2); color: var(--accent); }
   .sidebar__add { margin-top: 14px; background: var(--accent); color: var(--accent-ink); border-radius: 14px; }
-  .sidebar__badge { position: absolute; top: 4px; right: 2px; font-family: var(--mono); font-size: 10.5px; line-height: 1; color: var(--accent); background: #2a2417; border-radius: 6px; padding: 3px 5px; }
   .sidebar__status { font-size: 12px; font-weight: 500; color: var(--dim); }
 
   .screen { --gx: max(32px, calc((100% - var(--content)) / 2)); }
@@ -430,14 +448,14 @@ textarea.field { resize: vertical; min-height: 66px; }
   .sidebar__item .sidebar__label,
   .sidebar__status .sidebar__label { flex-grow: 1; }
   .sidebar__add { width: auto; height: 44px; padding: 0 12px; justify-content: center; font-size: 14.5px; }
-  .sidebar__badge { position: static; }
   .sidebar__status { height: 36px; font-size: 12px; }
 
   /* A spool opens beside the list. */
   .split { display: flex; }
   .split > .screen { flex: 1 1 0; min-width: 0; --gx: max(32px, calc((100% - var(--content)) / 2)); }
-  .detailpane { flex: 0 0 380px; height: 100dvh; overflow-y: auto; background: #14161a; border-left: 1px solid var(--line); }
+  /* Beside the list, not inside it: it stays in view and scrolls on its own when a spool is long. */
+  .detailpane { flex: 0 0 380px; align-self: flex-start; position: sticky; top: 0; height: 100dvh; overflow-y: auto; background: #14161a; border-left: 1px solid var(--line); }
   .detailpane .empty { padding: 48px 28px; }
-  .screen--embedded { height: auto; min-height: 100%; --gx: 28px; }
-  .screen--embedded .screen__body { padding-top: 32px; overflow: visible; }
+  .screen--embedded { min-height: 100%; --gx: 28px; }
+  .screen--embedded .screen__body { padding-top: 32px; }
 }

@@ -3,6 +3,7 @@ import { canEdit, useApp } from '../lib/store';
 import { href } from '../lib/router';
 import { totalSlots } from '../lib/types';
 import { BackButton, Icon, Note, swatchBackground } from '../components/ui';
+import { setEmptySpools } from '../lib/actions';
 
 export function PrinterList(): JSX.Element {
   const app = useApp();
@@ -84,6 +85,31 @@ export function PrinterList(): JSX.Element {
               {inv.spools.length - loadedCount}
             </span>
           </div>
+        </div>
+
+        <div class="sectionhead">
+          <span class="label grow">Empty spools</span>
+        </div>
+        <div class="card row" style={{ gap: '14px' }}>
+          <span class="grow">
+            <span style={{ display: 'block', fontSize: '13px', color: 'var(--text-2)' }}>Reusable spools with nothing on them</span>
+            <span class="muted" style={{ display: 'block', marginTop: '2px' }}>
+              A refill goes on one of these. Used-up refills give theirs back.
+            </span>
+          </span>
+          {writable ? (
+            <div class="stepper">
+              <button type="button" aria-label="One fewer empty spool" disabled={inv.emptySpools === 0} onClick={() => setEmptySpools(inv.emptySpools - 1)}>
+                <Icon name="minus" size={16} />
+              </button>
+              <span>{inv.emptySpools}</span>
+              <button type="button" aria-label="One more empty spool" onClick={() => setEmptySpools(inv.emptySpools + 1)}>
+                <Icon name="plus" size={16} />
+              </button>
+            </div>
+          ) : (
+            <span class="mono" style={{ fontSize: '15px' }}>{inv.emptySpools}</span>
+          )}
         </div>
 
         {writable && (

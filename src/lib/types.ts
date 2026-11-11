@@ -75,9 +75,9 @@ export function isLoaded(s: Spool): boolean {
   return s.location.kind !== 'storage';
 }
 
-/** A refill with no spool under it cannot be printed with. */
+/** A refill with no spool under it cannot be printed with. One that ran out needs nothing. */
 export function needsSpool(s: Spool): boolean {
-  return s.form === 'refill' && !s.mounted;
+  return s.form === 'refill' && !s.mounted && s.remainingPct > 0;
 }
 
 export function remainingGrams(s: Spool): number {
