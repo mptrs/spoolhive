@@ -258,7 +258,7 @@
       "form": "spool",
       "mounted": false,
       "netWeightG": 1000,
-      "remainingPct": 60,
+      "remainingPct": 37,
       "sealed": false,
       "openedAt": "2026-09-28T21:26:11.962Z",
       "dryState": "dry",
@@ -814,6 +814,6 @@
     }
   ],
   "emptySpools": 1,
-  "updatedAt": "2026-11-13T20:37:18.092Z",
+  "updatedAt": "2026-11-13T20:38:03.062Z",
   "resealBags": 10
 }
