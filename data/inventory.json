@@ -18,6 +18,23 @@
   ],
   "spools": [
     {
+      "brand": "Elegoo",
+      "material": "PLA+",
+      "colorName": "Black",
+      "hex": "#000000",
+      "form": "spool",
+      "mounted": false,
+      "netWeightG": 1000,
+      "remainingPct": 100,
+      "sealed": true,
+      "dryState": "dry",
+      "location": {
+        "kind": "storage"
+      },
+      "id": "1b2e4de2-c707-40f3-9efa-e30a86c85649",
+      "addedAt": "2026-11-13T19:22:25.603Z"
+    },
+    {
       "brand": "Bambu Lab",
       "material": "PLA Basic",
       "colorName": "Beige",
@@ -830,5 +847,5 @@
     }
   ],
   "emptySpools": 0,
-  "updatedAt": "2026-11-13T19:22:09.260Z"
+  "updatedAt": "2026-11-13T19:22:25.603Z"
 }
