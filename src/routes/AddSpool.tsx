@@ -30,6 +30,8 @@ export function AddSpool(): JSX.Element {
   const [sealed, setSealed] = useState(true);
   const [remaining, setRemaining] = useState(100);
   const [weight, setWeight] = useState(1000);
+  // A refill with no spool under it is still in its factory bag.
+  const isSealed = sealed || (form === 'refill' && !mounted);
 
   if (!selection) {
     return (
@@ -99,21 +101,23 @@ export function AddSpool(): JSX.Element {
             </div>
           )}
 
-          <div style={{ marginTop: '14px' }}>
-            <span class="label" style={{ marginBottom: '8px' }}>
-              Packaging
-            </span>
-            <div class="seg">
-              <button type="button" data-on={sealed} onClick={() => { setSealed(true); setRemaining(100); }}>
-                Sealed
-              </button>
-              <button type="button" data-on={!sealed} onClick={() => setSealed(false)}>
-                Already opened
-              </button>
+          {!(form === 'refill' && !mounted) && (
+            <div style={{ marginTop: '14px' }}>
+              <span class="label" style={{ marginBottom: '8px' }}>
+                Packaging
+              </span>
+              <div class="seg">
+                <button type="button" data-on={sealed} onClick={() => { setSealed(true); setRemaining(100); }}>
+                  Sealed
+                </button>
+                <button type="button" data-on={!sealed} onClick={() => setSealed(false)}>
+                  Already opened
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
-          {!sealed && (
+          {!isSealed && (
             <div style={{ marginTop: '14px' }}>
               <div class="row" style={{ alignItems: 'baseline' }}>
                 <label class="label grow" for="rem2">
@@ -177,9 +181,9 @@ export function AddSpool(): JSX.Element {
                 form,
                 mounted: form === 'refill' ? mounted : false,
                 netWeightG: weight,
-                remainingPct: sealed ? 100 : remaining,
-                sealed,
-                openedAt: sealed ? undefined : new Date().toISOString(),
+                remainingPct: isSealed ? 100 : remaining,
+                sealed: isSealed,
+                openedAt: isSealed ? undefined : new Date().toISOString(),
                 dryState: 'dry',
                 location: form === 'refill' && !mounted ? { kind: 'storage' } : location,
               });
@@ -191,7 +195,7 @@ export function AddSpool(): JSX.Element {
 
           {form === 'refill' && !mounted && (
             <div style={{ marginTop: '12px' }}>
-              <Note>A refill with no spool under it goes to storage until you mount it.</Note>
+              <Note>A refill with no spool under it stays sealed in storage until you mount it.</Note>
             </div>
           )}
         </div>

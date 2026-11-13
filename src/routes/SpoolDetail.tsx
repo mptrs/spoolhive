@@ -139,24 +139,32 @@ export function SpoolDetail({ id, embedded = false }: { id: string; embedded?: b
             <Icon name="lock" />
             <span class="grow">{spool.sealed ? 'Sealed' : 'Opened'}</span>
             {!spool.sealed && spool.openedAt && <span class="detailrow__aside">since {shortDate(spool.openedAt)}</span>}
-            {writable && spool.sealed && (
+            {/* A refill without a spool is opened by mounting it, below. */}
+            {writable && spool.sealed && !grounded && (
               <button type="button" class="btn btn--ghost btn--row" onClick={() => setSealed(spool.id, false)}>
                 Open it
               </button>
             )}
           </div>
 
-          {writable && grounded && (
+          {spool.form === 'refill' && (
             <div class="detailrow">
               <Icon name="spool" />
               <span class="grow">
-                {inv.emptySpools === 0
-                  ? 'No empty spool free'
-                  : `${inv.emptySpools} empty ${inv.emptySpools === 1 ? 'spool' : 'spools'} free`}
+                {spool.mounted ? 'Refill on a reusable spool' : grounded ? 'Refill, no spool yet' : 'Refill'}
+                {writable && grounded && (
+                  <span class="muted" style={{ display: 'block', fontSize: '12px', marginTop: '2px' }}>
+                    {inv.emptySpools === 0
+                      ? 'No empty spool free'
+                      : `${inv.emptySpools} empty ${inv.emptySpools === 1 ? 'spool' : 'spools'} free`}
+                  </span>
+                )}
               </span>
-              <button type="button" class="btn btn--ghost btn--row" disabled={inv.emptySpools === 0} onClick={() => mountRefill(spool.id)}>
-                Mount on spool
-              </button>
+              {writable && grounded && (
+                <button type="button" class="btn btn--ghost btn--row" disabled={inv.emptySpools === 0} onClick={() => mountRefill(spool.id)}>
+                  Mount on spool
+                </button>
+              )}
             </div>
           )}
 

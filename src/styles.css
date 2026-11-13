@@ -330,6 +330,11 @@ textarea.field { resize: vertical; min-height: 66px; }
 .reel--sealed { border: 1px solid var(--green); background: rgba(79, 180, 119, 0.35); }
 /* An opened spool resealed in a bag: dashed, like a zip seal, around its normal level. */
 .reel--bagged { outline: 1px dashed var(--text-2); outline-offset: 1px; }
+/* A refill on a reusable spool: a hub dot in the middle, like the spool's core. */
+.reel--reusable { position: relative; }
+.reel--reusable::after { content: ''; position: absolute; left: 50%; top: 50%; width: 3px; height: 3px; margin: -1.5px 0 0 -1.5px; border-radius: 50%; background: var(--text); }
+/* A refill with no spool yet is a loose coil: smaller and centred, always sealed. */
+.reel--refill { width: 5px; height: 16px; align-self: center; }
 .reels__more { font-family: var(--mono); font-size: 10.5px; color: var(--faint); align-self: center; }
 
 .colourrow { display: flex; align-items: center; gap: 12px; padding: 9px 0; min-height: 52px; border-bottom: 1px solid var(--line-soft); color: var(--text); width: 100%; text-align: left; background: none; border-left: 0; border-right: 0; border-top: 0; }

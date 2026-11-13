@@ -109,7 +109,9 @@ export function remainingGrams(s: Spool): number {
  *  - A sealed spool is unopened, so it is full, dry, has no opened date, and
  *    cannot be in a printer. Loading or emptying one opens it first.
  *  - `mounted` only means anything for a refill, and a mounted refill is open.
- *  - A refill with no spool under it physically cannot be in a printer.
+ *  - A refill with no spool under it physically cannot be in a printer, and
+ *    is still in its factory bag: it only gets opened by winding it onto a
+ *    spool. One that ran out keeps its empty level so Reorder still sees it.
  *  - One slot holds one spool.
  *  - A resealable bag only holds an opened spool in storage; loading it into
  *    a printer, emptying it or it being factory-sealed frees the bag. You
@@ -132,6 +134,8 @@ export function reconcile(inv: Inventory): void {
     if (spool.form === 'refill' && !spool.mounted && spool.location.kind !== 'storage') {
       spool.location = { kind: 'storage' };
     }
+
+    if (needsSpool(spool)) spool.sealed = true;
 
     if (spool.sealed) {
       spool.remainingPct = 100;
