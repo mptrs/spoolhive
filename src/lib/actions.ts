@@ -1,5 +1,5 @@
 import { mutate } from './store';
-import { totalSlots, type Inventory, type Location, type Printer, type Spool } from './types';
+import { canBag, freeBags, totalSlots, type Inventory, type Location, type Printer, type Spool } from './types';
 import { newId } from './util';
 
 export function addSpool(spool: Omit<Spool, 'id' | 'addedAt'>): string {
@@ -148,6 +148,23 @@ export function mountRefill(id: string, location?: Location): void {
     }
     if (location) place(inv, id, location);
   }, location ? 'Mount refill and load it' : 'Mount refill on a spool');
+}
+
+/** Puts an opened spool in a free resealable bag, or takes it out again. */
+export function setInBag(id: string, inBag: boolean): void {
+  mutate((inv) => {
+    const spool = inv.spools.find((s) => s.id === id);
+    if (!spool || Boolean(spool.inBag) === inBag) return;
+    if (inBag && (!canBag(spool) || freeBags(inv) <= 0)) return;
+    spool.inBag = inBag;
+  }, inBag ? 'Put spool in a reseal bag' : 'Take spool out of its reseal bag');
+}
+
+/** The total number of bags you own; it cannot go below the ones in use. */
+export function setResealBags(n: number): void {
+  mutate((inv) => {
+    inv.resealBags = Math.max(0, n);
+  }, 'Update reseal bag count');
 }
 
 export function setEmptySpools(n: number): void {

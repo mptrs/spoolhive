@@ -328,6 +328,8 @@ textarea.field { resize: vertical; min-height: 66px; }
 .reel { display: flex; align-items: flex-end; width: 7px; height: 26px; border-radius: 2px; background: var(--surface-3); overflow: hidden; }
 .reel span { display: block; width: 100%; }
 .reel--sealed { border: 1px solid var(--green); background: rgba(79, 180, 119, 0.35); }
+/* An opened spool resealed in a bag: dashed, like a zip seal, around its normal level. */
+.reel--bagged { outline: 1px dashed var(--text-2); outline-offset: 1px; }
 .reels__more { font-family: var(--mono); font-size: 10.5px; color: var(--faint); align-self: center; }
 
 .colourrow { display: flex; align-items: center; gap: 12px; padding: 9px 0; min-height: 52px; border-bottom: 1px solid var(--line-soft); color: var(--text); width: 100%; text-align: left; background: none; border-left: 0; border-right: 0; border-top: 0; }

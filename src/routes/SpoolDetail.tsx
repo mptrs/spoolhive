@@ -2,9 +2,9 @@ import type { JSX } from 'preact';
 import { useState } from 'preact/hooks';
 import { canEdit, useApp } from '../lib/store';
 import { back, href } from '../lib/router';
-import { isLoaded, locationText, needsSpool, remainingGrams } from '../lib/types';
+import { bagsInUse, canBag, freeBags, isLoaded, locationText, needsSpool, remainingGrams } from '../lib/types';
 import { BackButton, Icon, Note, Swatch } from '../components/ui';
-import { deleteSpool, markEmpty, mountRefill, recordPrint, returnEmptySpool, setSealed, unloadSpool } from '../lib/actions';
+import { deleteSpool, markEmpty, mountRefill, recordPrint, returnEmptySpool, setInBag, setSealed, unloadSpool } from '../lib/actions';
 import { shortDate } from '../lib/util';
 
 function levelColour(pct: number): string {
@@ -158,6 +158,31 @@ export function SpoolDetail({ id, embedded = false }: { id: string; embedded?: b
                 Mount on spool
               </button>
             </div>
+          )}
+
+          {canBag(spool) && (
+            <label class="detailrow" style={{ cursor: writable ? 'pointer' : undefined }}>
+              <Icon name="lock" />
+              <span class="grow">
+                In resealable bag
+                {!spool.inBag && (
+                  <span class="muted" style={{ display: 'block', fontSize: '12px', marginTop: '2px' }}>
+                    {freeBags(inv) === 0
+                      ? (inv.resealBags ?? 0) === 0
+                        ? 'No bags yet — set how many you own under Manage printers'
+                        : `All ${bagsInUse(inv)} bags are in use`
+                      : `${freeBags(inv)} of ${inv.resealBags} ${inv.resealBags === 1 ? 'bag' : 'bags'} free`}
+                  </span>
+                )}
+              </span>
+              <input
+                type="checkbox"
+                checked={Boolean(spool.inBag)}
+                disabled={!writable || (!spool.inBag && freeBags(inv) === 0)}
+                onChange={(e) => setInBag(spool.id, (e.target as HTMLInputElement).checked)}
+                style={{ width: '22px', height: '22px', accentColor: 'var(--accent)' }}
+              />
+            </label>
           )}
 
           {writable && (

@@ -1,14 +1,16 @@
 import type { JSX } from 'preact';
 import { canEdit, useApp } from '../lib/store';
 import { href } from '../lib/router';
-import { totalSlots } from '../lib/types';
+import { bagsInUse, freeBags, totalSlots } from '../lib/types';
 import { BackButton, Icon, Note, swatchBackground } from '../components/ui';
-import { setEmptySpools } from '../lib/actions';
+import { setEmptySpools, setResealBags } from '../lib/actions';
 
 export function PrinterList(): JSX.Element {
   const app = useApp();
   const { inv } = app;
   const writable = canEdit(app);
+  const bags = inv.resealBags ?? 0;
+  const bagged = bagsInUse(inv);
   const loadedCount = inv.spools.filter((s) => s.location.kind !== 'storage').length;
   const capacity = inv.printers.reduce((n, p) => n + totalSlots(p), 0);
 
@@ -109,6 +111,31 @@ export function PrinterList(): JSX.Element {
             </div>
           ) : (
             <span class="mono" style={{ fontSize: '15px' }}>{inv.emptySpools}</span>
+          )}
+        </div>
+
+        <div class="sectionhead">
+          <span class="label grow">Reseal bags</span>
+        </div>
+        <div class="card row" style={{ gap: '14px' }}>
+          <span class="grow">
+            <span style={{ display: 'block', fontSize: '13px', color: 'var(--text-2)' }}>Resealable bags you own</span>
+            <span class="muted" style={{ display: 'block', marginTop: '2px' }}>
+              {bagged} in use · {freeBags(inv)} free. Loading a bagged spool frees its bag.
+            </span>
+          </span>
+          {writable ? (
+            <div class="stepper">
+              <button type="button" aria-label="One fewer reseal bag" disabled={bags <= bagged} onClick={() => setResealBags(bags - 1)}>
+                <Icon name="minus" size={16} />
+              </button>
+              <span>{bags}</span>
+              <button type="button" aria-label="One more reseal bag" onClick={() => setResealBags(bags + 1)}>
+                <Icon name="plus" size={16} />
+              </button>
+            </div>
+          ) : (
+            <span class="mono" style={{ fontSize: '15px' }}>{bags}</span>
           )}
         </div>
 
