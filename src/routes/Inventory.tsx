@@ -3,7 +3,7 @@ import { useMemo, useState } from 'preact/hooks';
 import { canEdit, useApp } from '../lib/store';
 import { href, navigate } from '../lib/router';
 import { colourGroups, families, type ColourGroup } from '../lib/stock';
-import { locationText, type Inventory as Inv, type Spool } from '../lib/types';
+import { locationText, needsSpool, type Inventory as Inv, type Spool } from '../lib/types';
 import { Icon, Swatch, TabBar } from '../components/ui';
 import { SpoolDetail } from './SpoolDetail';
 import { useHeaderHeight, useWide } from '../lib/viewport';
@@ -149,6 +149,20 @@ export function Inventory({ selected }: { selected: string | null }): JSX.Elemen
               </span>
               open
             </span>
+            {inv.spools.some((s) => s.form === 'refill' && s.mounted) && (
+              <span>
+                <span class="reel reel--reusable" style={{ height: '16px' }}>
+                  <span style={{ height: '60%', background: 'var(--green)' }} />
+                </span>
+                on reusable spool
+              </span>
+            )}
+            {inv.spools.some(needsSpool) && (
+              <span>
+                <span class="reel reel--sealed reel--refill" />
+                refill, no spool yet
+              </span>
+            )}
             {inv.spools.some((s) => s.inBag) && (
               <span>
                 <span class="reel reel--bagged" style={{ height: '16px' }}>
@@ -213,9 +227,10 @@ function Reels({ spools }: { spools: Spool[] }): JSX.Element {
     <span class="reels" aria-hidden="true">
       {shown.map((s) =>
         s.sealed ? (
-          <span key={s.id} class="reel reel--sealed" />
+          // A refill with no spool yet is a loose coil: smaller, centred.
+          <span key={s.id} class={needsSpool(s) ? 'reel reel--sealed reel--refill' : 'reel reel--sealed'} />
         ) : (
-          <span key={s.id} class={s.inBag ? 'reel reel--bagged' : 'reel'}>
+          <span key={s.id} class={['reel', s.inBag && 'reel--bagged', s.form === 'refill' && s.mounted && 'reel--reusable'].filter(Boolean).join(' ')}>
             <span style={{ height: `${Math.max(s.remainingPct, 4)}%`, background: levelColour(s.remainingPct) }} />
           </span>
         ),
