@@ -780,7 +780,7 @@
       "form": "spool",
       "mounted": false,
       "netWeightG": 1000,
-      "remainingPct": 70,
+      "remainingPct": 62,
       "sealed": false,
       "openedAt": "2026-09-22T13:21:25.677Z",
       "dryState": "dry",
@@ -847,5 +847,5 @@
     }
   ],
   "emptySpools": 0,
-  "updatedAt": "2026-11-13T19:28:02.225Z"
+  "updatedAt": "2026-11-13T19:30:22.844Z"
 }
