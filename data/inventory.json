@@ -701,7 +701,8 @@
       },
       "id": "1b3935f7-ec84-40e6-b35e-549d1072c1f8",
       "addedAt": "2026-09-22T13:29:56.831Z",
-      "notes": "Sealed bag"
+      "notes": "Sealed bag",
+      "inBag": true
     },
     {
       "brand": "Elegoo",
@@ -831,6 +832,6 @@
     }
   ],
   "emptySpools": 0,
-  "updatedAt": "2026-11-13T20:23:39.341Z",
+  "updatedAt": "2026-11-13T20:24:13.603Z",
   "resealBags": 10
 }
