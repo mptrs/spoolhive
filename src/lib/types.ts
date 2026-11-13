@@ -33,6 +33,8 @@ export interface Spool {
   openedAt?: string;
   dryState: DryState;
   driedAt?: string;
+  /** An opened spool kept in one of your resealable bags. Only possible in storage. */
+  inBag?: boolean;
   location: Location;
   notes?: string;
   addedAt: string;
@@ -44,6 +46,8 @@ export interface Inventory {
   spools: Spool[];
   /** Reusable spools sitting empty, available for a refill. */
   emptySpools: number;
+  /** How many resealable bags you own in total; which are in use follows from `Spool.inBag`. */
+  resealBags?: number;
   updatedAt: string;
 }
 
@@ -80,6 +84,19 @@ export function needsSpool(s: Spool): boolean {
   return s.form === 'refill' && !s.mounted && s.remainingPct > 0;
 }
 
+export function bagsInUse(inv: Inventory): number {
+  return inv.spools.filter((s) => s.inBag).length;
+}
+
+export function freeBags(inv: Inventory): number {
+  return Math.max(0, (inv.resealBags ?? 0) - bagsInUse(inv));
+}
+
+/** Only an opened spool on the shelf with filament left can go into a bag. */
+export function canBag(s: Spool): boolean {
+  return !s.sealed && s.location.kind === 'storage' && s.remainingPct > 0;
+}
+
 export function remainingGrams(s: Spool): number {
   return Math.round((s.netWeightG * s.remainingPct) / 100);
 }
@@ -94,6 +111,9 @@ export function remainingGrams(s: Spool): number {
  *  - `mounted` only means anything for a refill, and a mounted refill is open.
  *  - A refill with no spool under it physically cannot be in a printer.
  *  - One slot holds one spool.
+ *  - A resealable bag only holds an opened spool in storage; loading it into
+ *    a printer, emptying it or it being factory-sealed frees the bag. You
+ *    never own fewer bags than are in use.
  */
 export function reconcile(inv: Inventory): void {
   inv.emptySpools = Math.max(0, Math.round(inv.emptySpools));
@@ -147,4 +167,10 @@ export function reconcile(inv: Inventory): void {
     if (taken.has(key)) spool.location = { kind: 'storage' };
     else taken.add(key);
   }
+
+  for (const spool of inv.spools) {
+    if (spool.inBag && !canBag(spool)) delete spool.inBag;
+    else if (spool.inBag === false) delete spool.inBag;
+  }
+  inv.resealBags = Math.max(bagsInUse(inv), Math.round(inv.resealBags ?? 0));
 }

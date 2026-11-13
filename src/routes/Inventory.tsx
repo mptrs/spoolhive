@@ -149,6 +149,14 @@ export function Inventory({ selected }: { selected: string | null }): JSX.Elemen
               </span>
               open
             </span>
+            {inv.spools.some((s) => s.inBag) && (
+              <span>
+                <span class="reel reel--bagged" style={{ height: '16px' }}>
+                  <span style={{ height: '60%', background: 'var(--green)' }} />
+                </span>
+                in reseal bag
+              </span>
+            )}
             <span>
               <span style={{ color: 'var(--accent)', display: 'flex' }}>
                 <Icon name="loaded" size={14} />
@@ -207,7 +215,7 @@ function Reels({ spools }: { spools: Spool[] }): JSX.Element {
         s.sealed ? (
           <span key={s.id} class="reel reel--sealed" />
         ) : (
-          <span key={s.id} class="reel">
+          <span key={s.id} class={s.inBag ? 'reel reel--bagged' : 'reel'}>
             <span style={{ height: `${Math.max(s.remainingPct, 4)}%`, background: levelColour(s.remainingPct) }} />
           </span>
         ),
