@@ -19,6 +19,24 @@
   "spools": [
     {
       "brand": "Elegoo",
+      "material": "PLA Marble",
+      "colorName": "Marble",
+      "hex": "#B1B6B5",
+      "form": "spool",
+      "mounted": false,
+      "netWeightG": 1000,
+      "remainingPct": 60,
+      "sealed": false,
+      "openedAt": "2026-11-13T20:10:31.419Z",
+      "dryState": "dry",
+      "location": {
+        "kind": "storage"
+      },
+      "id": "6108fe82-5c3a-4c54-a801-e292d5a466c1",
+      "addedAt": "2026-11-13T20:10:31.420Z"
+    },
+    {
+      "brand": "Elegoo",
       "material": "PLA+",
       "colorName": "Black",
       "hex": "#000000",
@@ -829,5 +847,5 @@
     }
   ],
   "emptySpools": 0,
-  "updatedAt": "2026-11-13T20:10:00.876Z"
+  "updatedAt": "2026-11-13T20:10:31.420Z"
 }
