@@ -335,7 +335,8 @@
         "kind": "storage"
       },
       "id": "51258c8d-174f-4b50-9db6-b3201eda3311",
-      "addedAt": "2026-09-28T21:22:15.540Z"
+      "addedAt": "2026-09-28T21:22:15.540Z",
+      "inBag": true
     },
     {
       "brand": "Bambu Lab",
@@ -813,6 +814,6 @@
     }
   ],
   "emptySpools": 1,
-  "updatedAt": "2026-11-13T20:36:37.658Z",
+  "updatedAt": "2026-11-13T20:37:18.092Z",
   "resealBags": 10
 }
