@@ -3,8 +3,8 @@ import { useMemo, useState } from 'preact/hooks';
 import { canEdit, useApp } from '../lib/store';
 import { href, navigate } from '../lib/router';
 import { colourGroups, families, type ColourGroup } from '../lib/stock';
-import { locationText, needsSpool, type Inventory as Inv, type Spool } from '../lib/types';
-import { Icon, Swatch, TabBar } from '../components/ui';
+import { needsSpool, type Spool } from '../lib/types';
+import { Icon, SpoolDisc, TabBar } from '../components/ui';
 import { SpoolDetail } from './SpoolDetail';
 import { useHeaderHeight, useWide } from '../lib/viewport';
 
@@ -15,7 +15,6 @@ export function Inventory({ selected }: { selected: string | null }): JSX.Elemen
   const { inv } = app;
   const writable = canEdit(app);
   const [query, setQuery] = useState('');
-  const [open, setOpen] = useState<Record<string, boolean>>({});
 
   const all = useMemo(() => families(inv.spools), [inv.spools]);
   const lowCount = useMemo(() => colourGroups(inv.spools).filter((g) => g.low).length, [inv.spools]);
@@ -124,14 +123,7 @@ export function Inventory({ selected }: { selected: string | null }): JSX.Elemen
             </div>
             <div class="groups">
             {f.groups.map((g) => (
-              <GroupRow
-                key={g.key}
-                group={g}
-                inv={inv}
-                selected={selected}
-                expanded={open[g.key] ?? g.spools.some((s) => s.id === selected)}
-                onToggle={() => setOpen((prev) => ({ ...prev, [g.key]: !prev[g.key] }))}
-              />
+              <GroupRow key={g.key} group={g} selected={selected} />
             ))}
             </div>
           </section>
@@ -249,22 +241,23 @@ function summary(g: ColourGroup): string {
   return parts.join(', ');
 }
 
-function GroupRow({
-  group: g,
-  inv,
-  selected,
-  expanded,
-  onToggle,
-}: {
-  group: ColourGroup;
-  inv: Inv;
-  selected: string | null;
-  expanded: boolean;
-  onToggle: () => void;
-}): JSX.Element {
-  const body = (
-    <>
-      <Swatch hex={g.hex} hexes={g.hexes} size={28} radius={14} />
+/**
+ * One card per colour. Picking it opens its first spool - the loaded one, else
+ * the fullest open one - and the spool page switches between the others, so the
+ * list never has to fold open.
+ */
+function GroupRow({ group: g, selected }: { group: ColourGroup; selected: string | null }): JSX.Element {
+  const first = g.spools[0];
+  const count = g.spools.length > 1 ? `${g.spools.length} spools, ` : '';
+  return (
+    <a
+      class="colourrow"
+      data-active={g.spools.some((s) => s.id === selected)}
+      href={href(`/spool/${first.id}`)}
+      onClick={(e) => swapSpool(e, selected, first.id)}
+      aria-label={`${g.colorName}, ${g.brand} ${g.material}: ${count}${summary(g)}${g.loaded ? ', in a printer' : ''}`}
+    >
+      <SpoolDisc hex={g.hex} hexes={g.hexes} pct={first.remainingPct} reusable={first.form === 'refill' && first.mounted} size={30} />
       <span class="grow">
         <span class="colourrow__name truncate" data-low={g.low}>
           {g.colorName}
@@ -276,41 +269,6 @@ function GroupRow({
       </span>
       <span class="colourrow__printer">{g.loaded && <Icon name="loaded" size={18} />}</span>
       <Reels spools={g.spools} />
-    </>
-  );
-
-  if (g.spools.length === 1) {
-    const s = g.spools[0];
-    return (
-      <a class="colourrow" data-active={s.id === selected} href={href(`/spool/${s.id}`)} onClick={(e) => swapSpool(e, selected, s.id)} aria-label={`${g.colorName}, ${g.brand} ${g.material}: ${summary(g)}${g.loaded ? ', in a printer' : ''}`}>
-        {body}
-      </a>
-    );
-  }
-
-  return (
-    <>
-      <button type="button" class="colourrow" data-active={g.spools.some((s) => s.id === selected)} aria-expanded={expanded} onClick={onToggle} aria-label={`${g.colorName}, ${g.brand} ${g.material}: ${g.spools.length} spools, ${summary(g)}`}>
-        {body}
-      </button>
-      {expanded && (
-        <div class="colourrow__members">
-          {g.spools.map((s, i) => (
-            <a key={s.id} class="colourrow" data-active={s.id === selected} href={href(`/spool/${s.id}`)} onClick={(e) => swapSpool(e, selected, s.id)}>
-              <span class="grow">
-                <span class="colourrow__name" style={{ fontSize: '13.5px' }}>
-                  Spool {i + 1}
-                </span>
-                <span class="colourrow__sub">{s.location.kind === 'storage' ? (s.sealed ? 'Sealed' : 'Storage') : locationText(inv, s.location)}</span>
-              </span>
-              <span class="colourrow__printer">{s.location.kind !== 'storage' && <Icon name="loaded" size={18} />}</span>
-              <span class="mono" style={{ fontSize: '12px', color: s.sealed ? 'var(--green-text)' : 'var(--text-2)', width: '50px', textAlign: 'right' }}>
-                {s.sealed ? 'full' : `${s.remainingPct}%`}
-              </span>
-            </a>
-          ))}
-        </div>
-      )}
-    </>
+    </a>
   );
 }

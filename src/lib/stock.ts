@@ -40,7 +40,7 @@ export interface Family {
   sealed: number;
 }
 
-function groupKey(s: Spool): string {
+export function groupKey(s: Spool): string {
   return `${s.brand}|${s.material}|${s.colorName}|${s.hex}`.toLowerCase();
 }
 
