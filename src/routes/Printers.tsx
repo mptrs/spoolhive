@@ -2,7 +2,7 @@ import type { JSX } from 'preact';
 import { canEdit, useApp } from '../lib/store';
 import { href } from '../lib/router';
 import { needsSpool, totalSlots, type Printer, type Spool } from '../lib/types';
-import { Bar, Icon, Note, Swatch, TabBar, pctColor } from '../components/ui';
+import { Icon, Note, SpoolDisc, TabBar, pctColor } from '../components/ui';
 import { unloadSpool } from '../lib/actions';
 import { relativeTime } from '../lib/util';
 import { colourGroups } from '../lib/stock';
@@ -171,7 +171,7 @@ function SlotTile({
       <>
         <span
           class="swatch"
-          style={{ width: '28px', height: '28px', borderRadius: '8px', background: 'transparent', boxShadow: 'inset 0 0 0 1px var(--line)' }}
+          style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'transparent', border: '1px dashed var(--line)', boxSizing: 'border-box' }}
         />
         <div class="slot__name" style={{ color: 'var(--faint)' }}>
           Empty
@@ -197,14 +197,13 @@ function SlotTile({
       {/* The tile is the link; eject sits over its corner as a real button,
           so one tap at the machine takes the roll out. */}
       <a class="slot__link" href={href(`/spool/${spool.id}`)}>
-        <Swatch hex={spool.hex} hexes={spool.hexes} size={28} radius={8} />
+        <SpoolDisc hex={spool.hex} hexes={spool.hexes} pct={spool.remainingPct} reusable={spool.form === 'refill' && spool.mounted} />
         <div class="slot__name truncate">{spool.colorName}</div>
         <div class="slot__sub truncate">
           {spool.brand} · {spool.material}
         </div>
         <div class="row" style={{ gap: '7px', marginTop: '9px' }}>
-          <span class="mono slot__tag">{tag}</span>
-          <Bar pct={spool.remainingPct} />
+          <span class="mono slot__tag grow">{tag}</span>
           <span class="mono" style={{ fontSize: '10.5px', color: pctColor(spool.remainingPct) }}>
             {spool.remainingPct}%
           </span>
