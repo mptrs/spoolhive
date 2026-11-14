@@ -1,7 +1,8 @@
 import type { JSX } from 'preact';
 import { useState } from 'preact/hooks';
 import { canEdit, useApp } from '../lib/store';
-import { back, href } from '../lib/router';
+import { back, href, navigate } from '../lib/router';
+import { colourGroups, groupKey } from '../lib/stock';
 import { bagsInUse, canBag, freeBags, isLoaded, locationText, needsSpool, remainingGrams } from '../lib/types';
 import { BackButton, Icon, Note, SpoolDisc } from '../components/ui';
 import { deleteSpool, markEmpty, mountRefill, recordPrint, returnEmptySpool, setInBag, setSealed, unloadSpool } from '../lib/actions';
@@ -38,6 +39,7 @@ export function SpoolDetail({ id, embedded = false }: { id: string; embedded?: b
   }
 
   const pct = spool.remainingPct;
+  const siblings = colourGroups(inv.spools).find((g) => g.key === groupKey(spool))?.spools ?? [spool];
   const used = Number(grams);
   const canSubtract = used > 0 && Number.isFinite(used);
   const grounded = needsSpool(spool);
@@ -64,14 +66,41 @@ export function SpoolDetail({ id, embedded = false }: { id: string; embedded?: b
       )}
 
       <div class="screen__body" style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
-        <div class="row" style={{ gap: '14px' }}>
-          <SpoolDisc hex={spool.hex} hexes={spool.hexes} pct={pct} reusable={spool.form === 'refill' && spool.mounted} size={48} />
-          <div class="grow">
-            <h1 style={{ margin: 0, fontSize: '24px', lineHeight: 1.15 }}>{spool.colorName}</h1>
-            <div style={{ fontSize: '13px', color: 'var(--dim)', marginTop: '2px' }}>
-              {spool.brand} · {spool.material}
+        <div>
+          <div class="row" style={{ gap: '14px' }}>
+            <SpoolDisc hex={spool.hex} hexes={spool.hexes} pct={pct} reusable={spool.form === 'refill' && spool.mounted} size={48} />
+            <div class="grow">
+              <h1 style={{ margin: 0, fontSize: '24px', lineHeight: 1.15 }}>{spool.colorName}</h1>
+              <div style={{ fontSize: '13px', color: 'var(--dim)', marginTop: '2px' }}>
+                {spool.brand} · {spool.material}
+              </div>
             </div>
           </div>
+
+          {/* Every spool of this colour, in the order the inventory picks the first one. */}
+          {siblings.length > 1 && (
+            <nav class="spoolchips" aria-label={`${siblings.length} spools of ${spool.colorName}`}>
+              {siblings.map((s) => (
+                <a
+                  key={s.id}
+                  class="spoolchip"
+                  data-active={s.id === spool.id}
+                  aria-current={s.id === spool.id ? 'page' : undefined}
+                  href={href(`/spool/${s.id}`)}
+                  title={locationText(inv, s.location)}
+                  onClick={(e) => {
+                    // Switching between spools of one colour is one step, not a trail to walk back through.
+                    e.preventDefault();
+                    if (s.id !== spool.id) navigate(`/spool/${s.id}`, { replace: true });
+                  }}
+                >
+                  <SpoolDisc hex={s.hex} hexes={s.hexes} pct={s.remainingPct} reusable={s.form === 'refill' && s.mounted} size={18} />
+                  {s.sealed ? 'sealed' : `${s.remainingPct}%`}
+                  {isLoaded(s) && <Icon name="loaded" size={13} />}
+                </a>
+              ))}
+            </nav>
+          )}
         </div>
 
         <div class="stack" style={{ gap: '10px' }}>
