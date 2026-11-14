@@ -40,6 +40,64 @@ export function Swatch({
   );
 }
 
+/**
+ * A spool seen from the side: the coloured ring is the filament still on it,
+ * thick when full and thin when nearly gone. A refill on a reusable spool shows
+ * that spool's core in the middle. A thin light edge keeps black filament
+ * visible against the dark tile.
+ */
+export function SpoolDisc({
+  hex,
+  hexes,
+  pct,
+  reusable = false,
+  size = 36,
+}: {
+  hex: string;
+  hexes?: string[];
+  pct: number;
+  reusable?: boolean;
+  size?: number;
+}): JSX.Element {
+  const c = size / 2;
+  const outer = c - 1;
+  const hub = outer * (reusable ? 0.38 : 0.3);
+  const filled = hub + (outer - hub) * (Math.max(0, Math.min(100, pct)) / 100);
+  const width = filled - hub;
+  const mid = (hub + filled) / 2;
+  const colours = hexes && hexes.length > 1 ? hexes : [hex];
+  const around = 2 * Math.PI * mid;
+  const part = around / colours.length;
+
+  return (
+    <svg class="spooldisc" width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden="true">
+      <circle cx={c} cy={c} r={outer - 0.5} fill="none" stroke="var(--surface-3)" stroke-width="1" />
+      {width > 0.3 &&
+        colours.map((h, i) => (
+          <circle
+            key={i}
+            cx={c}
+            cy={c}
+            r={mid}
+            fill="none"
+            stroke={h}
+            stroke-width={width}
+            stroke-dasharray={colours.length > 1 ? `${part} ${around}` : undefined}
+            stroke-dashoffset={colours.length > 1 ? -i * part : undefined}
+            transform={`rotate(-90 ${c} ${c})`}
+          />
+        ))}
+      {width > 0.3 && <circle cx={c} cy={c} r={filled} fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1" />}
+      {reusable ? (
+        // The core as a ring, so its hole shows whatever the tile is.
+        <circle cx={c} cy={c} r={hub * 0.7} fill="none" stroke="var(--faint)" stroke-width={hub * 0.6} />
+      ) : (
+        <circle cx={c} cy={c} r={hub} fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1" />
+      )}
+    </svg>
+  );
+}
+
 export function Bar({ pct }: { pct: number }): JSX.Element {
   const color = pct <= 15 ? 'var(--red)' : pct <= 30 ? 'var(--accent)' : 'var(--green)';
   return (
