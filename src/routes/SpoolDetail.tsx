@@ -3,7 +3,7 @@ import { useState } from 'preact/hooks';
 import { canEdit, useApp } from '../lib/store';
 import { back, href } from '../lib/router';
 import { bagsInUse, canBag, freeBags, isLoaded, locationText, needsSpool, remainingGrams } from '../lib/types';
-import { BackButton, Icon, Note, Swatch } from '../components/ui';
+import { BackButton, Icon, Note, SpoolDisc } from '../components/ui';
 import { deleteSpool, markEmpty, mountRefill, recordPrint, returnEmptySpool, setInBag, setSealed, unloadSpool } from '../lib/actions';
 import { shortDate } from '../lib/util';
 
@@ -65,7 +65,7 @@ export function SpoolDetail({ id, embedded = false }: { id: string; embedded?: b
 
       <div class="screen__body" style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
         <div class="row" style={{ gap: '14px' }}>
-          <Swatch hex={spool.hex} hexes={spool.hexes} size={48} radius={24} />
+          <SpoolDisc hex={spool.hex} hexes={spool.hexes} pct={pct} reusable={spool.form === 'refill' && spool.mounted} size={48} />
           <div class="grow">
             <h1 style={{ margin: 0, fontSize: '24px', lineHeight: 1.15 }}>{spool.colorName}</h1>
             <div style={{ fontSize: '13px', color: 'var(--dim)', marginTop: '2px' }}>
