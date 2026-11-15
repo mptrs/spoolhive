@@ -3,7 +3,8 @@ import { useMemo, useState } from 'preact/hooks';
 import { canEdit, useApp } from '../lib/store';
 import { href, navigate } from '../lib/router';
 import { colourGroups, families, type ColourGroup } from '../lib/stock';
-import { needsSpool, type Spool } from '../lib/types';
+import { JumpNav, Reels, SearchField, filterFamilies } from '../components/stock';
+import { needsSpool } from '../lib/types';
 import { Icon, SpoolDisc, TabBar } from '../components/ui';
 import { SpoolDetail } from './SpoolDetail';
 import { useHeaderHeight, useWide } from '../lib/viewport';
@@ -19,16 +20,7 @@ export function Inventory({ selected }: { selected: string | null }): JSX.Elemen
   const all = useMemo(() => families(inv.spools), [inv.spools]);
   const lowCount = useMemo(() => colourGroups(inv.spools).filter((g) => g.low).length, [inv.spools]);
 
-  const visible = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return all;
-    return all
-      .map((f) => ({
-        ...f,
-        groups: f.groups.filter((g) => `${g.colorName} ${g.brand} ${g.material}`.toLowerCase().includes(q)),
-      }))
-      .filter((f) => f.groups.length > 0);
-  }, [all, query]);
+  const visible = useMemo(() => filterFamilies(all, query), [all, query]);
 
   const sealed = inv.spools.filter((s) => s.sealed).length;
   const grams = inv.spools.reduce((sum, s) => sum + (s.netWeightG * s.remainingPct) / 100, 0);
@@ -54,42 +46,11 @@ export function Inventory({ selected }: { selected: string | null }): JSX.Elemen
           </a>
         )}
 
-        <div class="row" style={{ gap: '9px', marginTop: '12px', background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '11px', padding: '0 12px', height: '42px' }}>
-          <Icon name="search" size={16} />
-          <label class="sr-only" for="q">
-            Search filament
-          </label>
-          <input
-            id="q"
-            type="search"
-            value={query}
-            onInput={(e) => setQuery((e.target as HTMLInputElement).value)}
-            placeholder="Search colour, brand, material"
-            style={{ flexGrow: 1, background: 'transparent', border: 0, outline: 'none', minWidth: 0, fontSize: '14px' }}
-          />
+        <div style={{ marginTop: '12px' }}>
+          <SearchField value={query} onInput={setQuery} />
         </div>
 
-        {visible.length > 1 && (
-          <nav class="jump" aria-label="Jump to material" style={{ marginTop: '11px' }}>
-            {visible.map((f) => (
-              <a
-                key={f.name}
-                href={`#fam-${f.name}`}
-                onClick={(e) => {
-                  // The app routes on the hash, so scroll instead of following it,
-                  // and stop just under the sticky header rather than behind it.
-                  e.preventDefault();
-                  const section = document.getElementById(`fam-${f.name}`);
-                  if (!section || !header.current) return;
-                  window.scrollBy(0, section.getBoundingClientRect().top - header.current.getBoundingClientRect().bottom);
-                }}
-              >
-                {f.name}
-                <span>{f.spools}</span>
-              </a>
-            ))}
-          </nav>
-        )}
+        <JumpNav families={visible} header={header} />
       </header>
 
       <div class="screen__body">
@@ -200,36 +161,6 @@ function swapSpool(e: MouseEvent, selected: string | null, id: string): void {
   if (selected === null) return;
   e.preventDefault();
   if (id !== selected) navigate(`/spool/${id}`, { replace: true });
-}
-
-function levelColour(pct: number): string {
-  return pct <= 15 ? 'var(--red)' : pct <= 30 ? 'var(--accent)' : 'var(--green)';
-}
-
-const MAX_BARS = 5;
-
-/** Emptiest on the left, filling up to the right; a sealed spool is full, so it comes last. */
-function byLevel(a: Spool, b: Spool): number {
-  return (a.sealed ? 101 : a.remainingPct) - (b.sealed ? 101 : b.remainingPct);
-}
-
-function Reels({ spools }: { spools: Spool[] }): JSX.Element {
-  const shown = [...spools].sort(byLevel).slice(0, MAX_BARS);
-  return (
-    <span class="reels" aria-hidden="true">
-      {shown.map((s) =>
-        s.sealed ? (
-          // A refill with no spool yet is a loose coil: smaller, centred.
-          <span key={s.id} class={needsSpool(s) ? 'reel reel--sealed reel--refill' : 'reel reel--sealed'} />
-        ) : (
-          <span key={s.id} class={['reel', s.inBag && 'reel--bagged', s.form === 'refill' && s.mounted && 'reel--reusable'].filter(Boolean).join(' ')}>
-            <span style={{ height: `${Math.max(s.remainingPct, 4)}%`, background: levelColour(s.remainingPct) }} />
-          </span>
-        ),
-      )}
-      {spools.length > MAX_BARS && <span class="reels__more">+{spools.length - MAX_BARS}</span>}
-    </span>
-  );
 }
 
 function summary(g: ColourGroup): string {
