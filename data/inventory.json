@@ -96,15 +96,13 @@
       "colorName": "Dark Green",
       "hex": "#68724D",
       "form": "refill",
-      "mounted": true,
+      "mounted": false,
       "netWeightG": 1000,
-      "remainingPct": 23,
+      "remainingPct": 0,
       "sealed": false,
       "dryState": "dry",
       "location": {
-        "kind": "ams",
-        "printer": "maker-bee",
-        "slot": 1
+        "kind": "storage"
       },
       "id": "8d0c5f8c-437f-4a0e-a08d-700f4dff0002",
       "addedAt": "2026-10-07T17:12:29.259Z",
@@ -814,7 +812,7 @@
       "notes": "PLA+"
     }
   ],
-  "emptySpools": 1,
-  "updatedAt": "2026-11-17T11:19:12.707Z",
+  "emptySpools": 2,
+  "updatedAt": "2026-11-17T13:06:55.457Z",
   "resealBags": 10
 }
