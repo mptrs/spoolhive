@@ -47,7 +47,8 @@
       "sealed": false,
       "dryState": "dry",
       "location": {
-        "kind": "storage"
+        "kind": "direct",
+        "printer": "maker-ant"
       },
       "id": "1b2e4de2-c707-40f3-9efa-e30a86c85649",
       "addedAt": "2026-11-13T19:22:25.603Z",
@@ -811,6 +812,6 @@
     }
   ],
   "emptySpools": 2,
-  "updatedAt": "2026-11-21T16:19:50.797Z",
+  "updatedAt": "2026-11-21T16:20:06.716Z",
   "resealBags": 10
 }
