@@ -728,13 +728,16 @@
       "mounted": false,
       "netWeightG": 1000,
       "remainingPct": 100,
-      "sealed": true,
+      "sealed": false,
       "dryState": "dry",
       "location": {
-        "kind": "storage"
+        "kind": "ams",
+        "printer": "maker-bee",
+        "slot": 2
       },
       "id": "a9f96437-189f-4615-941f-bd2a6cfc4bde",
-      "addedAt": "2026-09-22T13:23:04.964Z"
+      "addedAt": "2026-09-22T13:23:04.964Z",
+      "openedAt": "2026-11-21T16:20:23.794Z"
     },
     {
       "brand": "Elegoo",
@@ -812,6 +815,6 @@
     }
   ],
   "emptySpools": 2,
-  "updatedAt": "2026-11-21T16:20:18.488Z",
+  "updatedAt": "2026-11-21T16:20:23.794Z",
   "resealBags": 10
 }
