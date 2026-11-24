@@ -1,10 +1,13 @@
 import { useSyncExternalStore } from 'preact/compat';
 import { reconcile, type Inventory } from './types';
 import { detectRepo, emptyInventory, readToken, writeToken, type RepoRef } from './config';
-import { ConflictError, MissingFileError, fetchInventory, pushInventory } from './github';
+import { ConflictError, MissingFileError, fetchInventory, fetchInventoryAt, pushInventory } from './github';
+import { mergeInventory } from './merge';
 
 const CACHE_KEY = 'fm.cache';
 const PUSH_DELAY_MS = 1500;
+/** How often one push may merge and retry before it gives up and asks. */
+const MAX_MERGES = 3;
 
 export interface AppState {
   inv: Inventory;
@@ -111,7 +114,7 @@ function schedulePush(message: string): void {
   pushTimer = setTimeout(() => void push(pendingMessage), PUSH_DELAY_MS);
 }
 
-export async function push(message = pendingMessage): Promise<void> {
+export async function push(message = pendingMessage, merges = 0): Promise<void> {
   if (!canEdit() || state.syncing || state.pending === 0) return;
   const { repo, token } = state;
   if (!repo || !token) return;
@@ -134,10 +137,40 @@ export async function push(message = pendingMessage): Promise<void> {
     if (state.pending > 0) schedulePush(pendingMessage);
   } catch (err) {
     if (err instanceof ConflictError) {
+      // Another device pushed first: fold its changes in and try again.
+      if (merges < MAX_MERGES && (await mergeWithRemote())) {
+        set({ syncing: false });
+        return push(message, merges + 1);
+      }
       set({ syncing: false, conflict: true, error: 'GitHub has a newer version of this file.' });
     } else {
       set({ syncing: false, error: err instanceof Error ? err.message : String(err) });
     }
+  }
+}
+
+/**
+ * Merges what GitHub has now into the local copy, using the version this copy
+ * was last synced at as the common base. Returns false if that cannot be done,
+ * so the caller falls back to asking.
+ */
+async function mergeWithRemote(): Promise<boolean> {
+  const { repo, token, sha: baseSha } = state;
+  if (!repo || !baseSha) return false;
+  const local = state.inv;
+  try {
+    const [remote, base] = await Promise.all([
+      fetchInventory(repo, token || undefined),
+      fetchInventoryAt(repo, baseSha, token || undefined),
+    ]);
+    let merged = mergeInventory(base, local, remote.inventory);
+    // Edits made while the merge was fetching sit on top of `local`.
+    if (state.inv !== local) merged = mergeInventory(local, state.inv, merged);
+    reconcile(merged);
+    set({ inv: merged, sha: remote.sha }, true);
+    return true;
+  } catch {
+    return false;
   }
 }
 
@@ -192,4 +225,6 @@ export function init(): void {
   });
   addEventListener('offline', () => set({ online: false }));
   void pull();
+  // Edits left over from last time go up now, merging if GitHub moved on.
+  if (state.pending > 0) void push();
 }
