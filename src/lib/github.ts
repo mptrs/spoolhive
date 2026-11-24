@@ -56,6 +56,16 @@ export async function fetchInventory(ref: RepoRef, token?: string): Promise<Remo
   return { inventory: JSON.parse(decodeBase64Utf8(body.content)) as Inventory, sha: body.sha };
 }
 
+/** Reads an earlier version of the file by its blob sha: the base for a merge. */
+export async function fetchInventoryAt(ref: RepoRef, sha: string, token?: string): Promise<Inventory> {
+  const url = `${API}/repos/${ref.owner}/${ref.repo}/git/blobs/${sha}`;
+  const res = await fetch(url, { headers: headers(token) });
+  if (!res.ok) throw new Error(await describe(res));
+  const body = (await res.json()) as { content?: string };
+  if (!body.content) throw new Error('GitHub returned no file content.');
+  return JSON.parse(decodeBase64Utf8(body.content)) as Inventory;
+}
+
 export async function pushInventory(
   ref: RepoRef,
   token: string,

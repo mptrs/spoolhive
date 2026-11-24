@@ -26,6 +26,10 @@ with a third machine or the mini growing an AMS lite.
   from GitHub's UI.
 - **It works offline.** The app is a PWA: the last synced copy opens without signal
   and edits queue until you are back.
+- **Two devices can edit at once.** If another device saved first, the app merges
+  instead of overwriting: edits to different spools or fields both land, and two
+  prints off the same spool both count. When both changed the same field otherwise,
+  this device's edit wins. Only if a merge is impossible does Sync ask you to pull.
 
 ## Setup
 
