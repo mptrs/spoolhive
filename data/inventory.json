@@ -205,7 +205,7 @@
       "form": "refill",
       "mounted": true,
       "netWeightG": 1000,
-      "remainingPct": 35,
+      "remainingPct": 14,
       "sealed": false,
       "dryState": "dry",
       "location": {
@@ -817,6 +817,6 @@
     }
   ],
   "emptySpools": 2,
-  "updatedAt": "2026-11-25T22:35:38.436Z",
+  "updatedAt": "2026-11-26T07:47:26.679Z",
   "resealBags": 10
 }
