@@ -203,15 +203,13 @@
       "colorName": "Black",
       "hex": "#000000",
       "form": "refill",
-      "mounted": true,
+      "mounted": false,
       "netWeightG": 1000,
-      "remainingPct": 14,
+      "remainingPct": 0,
       "sealed": false,
       "dryState": "dry",
       "location": {
-        "kind": "ams",
-        "printer": "maker-bee",
-        "slot": 1
+        "kind": "storage"
       },
       "id": "30278c5c-5a4e-4d27-af69-d8d3eec84765",
       "addedAt": "2026-09-28T21:32:08.416Z",
@@ -816,7 +814,7 @@
       "notes": "PLA+"
     }
   ],
-  "emptySpools": 2,
-  "updatedAt": "2026-11-26T12:53:42.282Z",
+  "emptySpools": 3,
+  "updatedAt": "2026-11-27T09:43:52.927Z",
   "resealBags": 10
 }
