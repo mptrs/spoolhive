@@ -223,7 +223,7 @@
       "form": "spool",
       "mounted": false,
       "netWeightG": 1000,
-      "remainingPct": 79,
+      "remainingPct": 58,
       "sealed": false,
       "dryState": "dry",
       "location": {
@@ -818,6 +818,6 @@
     }
   ],
   "emptySpools": 3,
-  "updatedAt": "2026-11-27T09:44:31.124Z",
+  "updatedAt": "2026-11-27T21:24:33.275Z",
   "resealBags": 10
 }
